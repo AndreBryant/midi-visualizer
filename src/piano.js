@@ -44,19 +44,19 @@ class Piano {
     this.#drawKeys(1);
   }
 
-  addNote(key, channel) {
+  setNote(key, channel) {
     const index = key - this.startKey;
     this.keyboardState[index].channel = channel;
     this.keyboardState[index].playing = true;
   }
 
-  removeNote(key, channel) {
+  unsetNote(key, channel) {
     const index = key - this.startKey;
     this.keyboardState[index].channel = null;
     this.keyboardState[index].playing = false;
   }
 
-  addNotesToCanvas(key, channel) {
+  drawKeyboardState() {
     for (let i = 0; i < this.keyboardState.length; i++) {
       if (!this.keyboardState[i].playing) continue;
 
@@ -89,16 +89,24 @@ class Piano {
     }
   }
 
-  updateKeyBoardState(noteTracks, currentTick) {
-    for (const noteTrack of noteTracks) {
+  updateKeyboardState(noteTracks, currentTick) {
+    this.keyboardState = Array.from(
+      { length: this.lastKey - this.startKey + 1 },
+      (_, index) => ({
+        key: this.startKey + index,
+        channel: null,
+        playing: false,
+      })
+    );
+
+    for (const [i, noteTrack] of noteTracks.entries()) {
       if (noteTrack.length > 0) {
         for (const note of noteTrack) {
           if (
             currentTick >= note.startTime &&
             currentTick < note.startTime + note.duration
           ) {
-            this.addNote(key, note.channel);
-          } else {
+            this.setNote(note.key, note.channel);
           }
         }
       }
@@ -113,7 +121,6 @@ class Piano {
   }
 
   #drawKeys(type) {
-    // There might be more so i used a switch case for now, like, i want to visualize a thread for pitchbend and stuff haha or maybe percussive or idk
     switch (type) {
       case 0:
         for (let i = 0; i < this.wk.length; i++) {
@@ -137,6 +144,7 @@ class Piano {
     const h = type ? this.blackKeyHeight : this.whiteKeyHeight;
     const w = this.whiteKeyWidth;
 
+    strokeWeight(0.25);
     stroke(type ? 0 : 95);
 
     if (channelColor) {
@@ -219,18 +227,26 @@ class Piano {
         rect(startPos, height - this.whiteKeyHeight, w, h);
       }
     } else {
-      rect(startPos, height - this.whiteKeyHeight, w * 0.55, h);
+      rect(startPos, height - this.whiteKeyHeight - 2, w * 0.55, h + 2);
     }
   }
 
   #drawKeyRim() {
     strokeWeight(2);
-    stroke(this.keyRimColor);
+    stroke(75);
     line(
       0,
       height - this.whiteKeyHeight - 4,
       width,
       height - this.whiteKeyHeight - 4
+    );
+    strokeWeight(2);
+    stroke(this.keyRimColor);
+    line(
+      0,
+      height - this.whiteKeyHeight - 2,
+      width,
+      height - this.whiteKeyHeight - 2
     );
   }
 

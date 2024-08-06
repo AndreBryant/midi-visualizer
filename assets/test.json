@@ -1,0 +1,168 @@
+{
+  "formatType": 1,
+  "tracks": 2,
+  "track": [
+    {
+      "event": [
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 3,
+          "data": ""
+        },
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 2,
+          "data": "Copyright (C) 2024"
+        },
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 6,
+          "data": "Setup"
+        },
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 81,
+          "data": 500000
+        },
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 88,
+          "data": [
+            4,
+            2,
+            24,
+            8
+          ]
+        },
+        {
+          "deltaTime": 1920,
+          "type": 255,
+          "metaType": 6,
+          "data": "Start"
+        },
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 47
+        }
+      ]
+    },
+    {
+      "event": [
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 3,
+          "data": ""
+        },
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 33,
+          "data": 0
+        },
+        {
+          "deltaTime": 1920,
+          "type": 9,
+          "channel": 0,
+          "data": [
+            36,
+            100
+          ]
+        },
+        {
+          "deltaTime": 240,
+          "type": 8,
+          "channel": 0,
+          "data": [
+            36,
+            0
+          ]
+        },
+        {
+          "deltaTime": 0,
+          "type": 9,
+          "channel": 0,
+          "data": [
+            38,
+            100
+          ]
+        },
+        {
+          "deltaTime": 240,
+          "type": 8,
+          "channel": 0,
+          "data": [
+            38,
+            0
+          ]
+        },
+        {
+          "deltaTime": 0,
+          "type": 9,
+          "channel": 0,
+          "data": [
+            40,
+            100
+          ]
+        },
+        {
+          "deltaTime": 240,
+          "type": 8,
+          "channel": 0,
+          "data": [
+            40,
+            0
+          ]
+        },
+        {
+          "deltaTime": 0,
+          "type": 9,
+          "channel": 0,
+          "data": [
+            41,
+            100
+          ]
+        },
+        {
+          "deltaTime": 240,
+          "type": 8,
+          "channel": 0,
+          "data": [
+            41,
+            0
+          ]
+        },
+        {
+          "deltaTime": 0,
+          "type": 9,
+          "channel": 0,
+          "data": [
+            43,
+            100
+          ]
+        },
+        {
+          "deltaTime": 960,
+          "type": 8,
+          "channel": 0,
+          "data": [
+            43,
+            0
+          ]
+        },
+        {
+          "deltaTime": 0,
+          "type": 255,
+          "metaType": 47
+        }
+      ]
+    }
+  ],
+  "timeDivision": 480
+}

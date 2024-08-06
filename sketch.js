@@ -1,39 +1,43 @@
 import { MidiParser } from "./node_modules/midi-parser-js/src/midi-parser.js";
 
-let base64;
 let midiArray;
+let noteTracks;
 let piano;
-let source;
 
 let w;
 let h;
-const numOfKeys = 88;
-const startKey = 21;
+const numOfKeys = 128;
+const startKey = 0;
+
+let frameSkip = 20;
+let frameCounter = 0;
 
 function setMidiArray(data) {
   midiArray = data;
 }
 
-function setup() {
-  source = document.getElementById("filereader");
-
-  MidiParser.parse(source, function (obj) {
-    setMidiArray(obj);
+function preload() {
+  midiArray = loadJSON("./assets/lyrith.json", (data) => {
+    noteTracks = interpretMidiEvents(data);
   });
+}
 
+function setup() {
   updateHW();
   createCanvas(w, h);
 
-  piano = new Piano(startKey, startKey + numOfKeys - 1, 75);
+  piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85]);
+  console.log(noteTracks);
 }
 
 function draw() {
-  background(25);
-  piano.show();
-  piano.addNote(24, 2);
-  piano.addNote(26, 3);
-  piano.addNote(28, 4);
-  piano.addNotesToCanvas();
+  frameCounter += frameSkip;
+  piano.updateKeyboardState(noteTracks, frameCounter);
+  if (frameCounter % frameSkip === 0) {
+    background(25);
+    piano.show();
+    piano.drawKeyboardState();
+  }
 }
 
 function windowResized() {
@@ -46,6 +50,8 @@ function updateHW() {
   w = window.innerWidth * 0.95;
   h = w > 1000 ? window.innerHeight * 0.9 : (9 * w) / 16;
 }
+
+window.preload = preload;
 window.setup = setup;
 window.draw = draw;
 window.windowResized = windowResized;
