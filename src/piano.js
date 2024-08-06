@@ -7,7 +7,7 @@ class Piano {
   blackKeyWidth;
   blackKeyHeight;
   keyRimColor;
-  keyboardState; // make use of this haha
+  keyboardState = []; // make use of this haha
   wk = [];
   bk = [];
 
@@ -26,6 +26,11 @@ class Piano {
           i,
         });
       }
+
+      this.keyboardState.push({
+        key: i,
+        channel: null,
+      });
     }
     this.updateDimensions();
   }
@@ -34,6 +39,21 @@ class Piano {
     this.#drawKeyRim();
     this.#drawKeys(0);
     this.#drawKeys(1);
+  }
+
+  updateKeyBoardState(noteTracks, currentTick) {
+    for (const noteTrack of noteTracks) {
+      if (noteTrack.length > 0) {
+        for (const note of noteTrack) {
+          if (
+            currentTick >= note.startTime &&
+            currentTick < note.startTime + note.duration
+          ) {
+            keyboard[note.key] = this.#designKey(key, note.channel);
+          }
+        }
+      }
+    }
   }
 
   updateDimensions() {
@@ -68,6 +88,7 @@ class Piano {
     const w = this.whiteKeyWidth;
 
     stroke(type ? 0 : 95);
+
     if (channelColor) {
       fill(channelColor);
     } else {
@@ -79,6 +100,10 @@ class Piano {
     } else {
       rect(startPos, height - this.whiteKeyHeight, w * 0.55, h);
     }
+  }
+
+  #designKey(key, channel) {
+    console.log(key, channel);
   }
 
   #drawKeyRim() {

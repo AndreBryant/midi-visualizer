@@ -9,6 +9,14 @@
         margin: 0;
         padding: 0;
       }
+      canvas {
+        border: 1px solid black;
+      }
+
+      .menu {
+        position: absolute;
+        color: white;
+      }
     </style>
   </head>
   <body>
@@ -18,8 +26,9 @@
     <script src="./src/midi-parsing/utils.js"></script>
 
     <script src="sketch.js" type="module"></script>
-
-    <label for="filereader">File:</label>
-    <input type="file" id="filereader" name="filereader" accept=".mid" />
+    <div class="menu">
+      <input type="file" id="filereader" name="filereader" accept=".mid" />
+      <!-- <label for="filereader">File:</label> -->
+    </div>
   </body>
 </html>

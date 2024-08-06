@@ -1,23 +1,27 @@
 import { MidiParser } from "./node_modules/midi-parser-js/src/midi-parser.js";
+
 let base64;
 let midiArray;
 let piano;
-let numOfKeys = 128;
-let startKey = 0;
-let w = window.innerWidth * 0.75;
-let h = (9 * w) / 16;
-let scheme = [];
+
+let w;
+let h;
+const numOfKeys = 88;
+const startKey = 21;
+const scheme = [];
 
 function setup() {
+  w = window.innerWidth * 0.95;
+  h = w > 1000 ? w / 2 : (9 * w) / 16;
   createCanvas(w, h);
-  background(25);
   loadColors();
-  console.log(w, h);
+
   piano = new Piano(startKey, startKey + numOfKeys - 1, 75);
-  piano.show();
 }
 
 function draw() {
+  background(25);
+  piano.show();
   // console.log(midiArray);
 }
 
@@ -30,5 +34,14 @@ function loadColors() {
   }
 }
 
+function windowResized() {
+  console.log("Window resized"); // Add this line to check if the function is called
+  w = window.innerWidth * 0.95;
+  h = w > 1000 ? w / 2 : (9 * w) / 16;
+  resizeCanvas(w, h);
+  piano.updateDimensions();
+}
+
 window.setup = setup;
 window.draw = draw;
+window.windowResized = windowResized;
