@@ -10,6 +10,7 @@ class Piano {
   keyboardState = []; // make use of this haha
   wk = [];
   bk = [];
+  colorScheme = [];
 
   constructor(startKey, lastKey, keyRimColor = 75) {
     this.startKey = startKey;
@@ -30,15 +31,62 @@ class Piano {
       this.keyboardState.push({
         key: i,
         channel: null,
+        playing: false,
       });
     }
     this.updateDimensions();
+    this.#loadColors();
   }
 
   show() {
     this.#drawKeyRim();
     this.#drawKeys(0);
     this.#drawKeys(1);
+  }
+
+  addNote(key, channel) {
+    const index = key - this.startKey;
+    this.keyboardState[index].channel = channel;
+    this.keyboardState[index].playing = true;
+  }
+
+  removeNote(key, channel) {
+    const index = key - this.startKey;
+    this.keyboardState[index].channel = null;
+    this.keyboardState[index].playing = false;
+  }
+
+  addNotesToCanvas(key, channel) {
+    for (let i = 0; i < this.keyboardState.length; i++) {
+      if (!this.keyboardState[i].playing) continue;
+
+      const { key, channel } = this.keyboardState[i];
+      const type = this.#checkType(key);
+      let startPos;
+      let wType = null;
+
+      if (!type) {
+        const index = this.wk.findIndex((k) => k.i === key);
+        startPos = index * this.whiteKeyWidth;
+
+        // Check if white key has left, right, or both black keys
+        const left = this.#checkType(key - 1);
+        const right = this.#checkType(key + 1);
+
+        if (left && right) {
+          wType = "inline";
+        } else if (left) {
+          wType = "left";
+        } else if (right) {
+          wType = "right";
+        }
+      } else {
+        const wkp = this.wk.filter((k) => k.i <= key).length;
+        startPos = wkp * this.blackKeyWidth - this.whiteKeyWidth / 4;
+      }
+
+      this.#drawKey({ type, wType }, startPos, this.colorScheme[channel]);
+    }
   }
 
   updateKeyBoardState(noteTracks, currentTick) {
@@ -49,7 +97,8 @@ class Piano {
             currentTick >= note.startTime &&
             currentTick < note.startTime + note.duration
           ) {
-            keyboard[note.key] = this.#designKey(key, note.channel);
+            this.addNote(key, note.channel);
+          } else {
           }
         }
       }
@@ -64,17 +113,18 @@ class Piano {
   }
 
   #drawKeys(type) {
+    // There might be more so i used a switch case for now, like, i want to visualize a thread for pitchbend and stuff haha or maybe percussive or idk
     switch (type) {
       case 0:
         for (let i = 0; i < this.wk.length; i++) {
-          this.#drawKey(0, i * this.whiteKeyWidth);
+          this.#drawKey({ type: 0 }, i * this.whiteKeyWidth);
         }
         break;
       case 1:
         for (const k of this.bk) {
           const wkp = this.wk.filter((n) => n.i <= k.i).length;
           const startPos = wkp * this.blackKeyWidth - this.whiteKeyWidth / 4;
-          this.#drawKey(1, startPos);
+          this.#drawKey({ type: 1 }, startPos);
         }
         break;
 
@@ -83,7 +133,7 @@ class Piano {
     }
   }
 
-  #drawKey(type, startPos, channelColor = null) {
+  #drawKey({ type, wType = null }, startPos, channelColor = null) {
     const h = type ? this.blackKeyHeight : this.whiteKeyHeight;
     const w = this.whiteKeyWidth;
 
@@ -96,14 +146,81 @@ class Piano {
     }
 
     if (!type) {
-      rect(startPos, height - this.whiteKeyHeight, w, h);
+      if (wType) {
+        const d = this.whiteKeyWidth / 4;
+        switch (wType) {
+          case "left":
+            beginShape();
+            vertex(
+              startPos,
+              height - this.whiteKeyHeight + this.blackKeyHeight
+            );
+            vertex(
+              startPos + d,
+              height - this.whiteKeyHeight + this.blackKeyHeight
+            );
+            vertex(startPos + d, height - this.whiteKeyHeight);
+            vertex(startPos + this.whiteKeyWidth, height - this.whiteKeyHeight);
+            vertex(startPos + this.whiteKeyWidth, height);
+            vertex(startPos, height);
+            endShape();
+            break;
+          case "right":
+            beginShape();
+            vertex(startPos, height - this.whiteKeyHeight);
+            vertex(
+              startPos + this.whiteKeyWidth - d,
+              height - this.whiteKeyHeight
+            );
+            vertex(
+              startPos + this.whiteKeyWidth - d,
+              height - this.whiteKeyHeight + this.blackKeyHeight
+            );
+            vertex(
+              startPos + this.whiteKeyWidth,
+              height - this.whiteKeyHeight + this.blackKeyHeight
+            );
+            vertex(startPos + this.whiteKeyWidth, height);
+            vertex(startPos, height);
+            endShape();
+            break;
+          case "inline":
+            beginShape();
+            vertex(startPos + d, height - this.whiteKeyHeight);
+            vertex(
+              startPos + this.whiteKeyWidth - d,
+              height - this.whiteKeyHeight
+            );
+            vertex(
+              startPos + this.whiteKeyWidth - d,
+              height - this.whiteKeyHeight + this.blackKeyHeight
+            );
+            vertex(
+              startPos + this.whiteKeyWidth,
+              height - this.whiteKeyHeight + this.blackKeyHeight
+            );
+            vertex(startPos + this.whiteKeyWidth, height);
+            vertex(startPos, height);
+            vertex(
+              startPos,
+              height - this.whiteKeyHeight + this.blackKeyHeight
+            );
+            vertex(
+              startPos + d,
+              height - this.whiteKeyHeight + this.blackKeyHeight
+            );
+            endShape();
+            break;
+
+          default:
+            break;
+        }
+      } else {
+        rect(startPos, height - this.whiteKeyHeight, w, h);
+      }
     } else {
       rect(startPos, height - this.whiteKeyHeight, w * 0.55, h);
     }
-  }
-
-  #designKey(key, channel) {
-    console.log(key, channel);
   }
 
   #drawKeyRim() {
@@ -115,6 +232,15 @@ class Piano {
       width,
       height - this.whiteKeyHeight - 4
     );
+  }
+
+  #loadColors() {
+    for (let i = 0; i < 16; i++) {
+      const r = Math.round(Math.random() * 255);
+      const g = Math.round(Math.random() * 255);
+      const b = Math.round(Math.random() * 255);
+      this.colorScheme.push(color(r, g, b));
+    }
   }
 
   #checkType(keyIndex) {
