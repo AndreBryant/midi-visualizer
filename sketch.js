@@ -9,7 +9,8 @@ let h; // Canvas height
 const numOfKeys = 88;
 const startKey = 21;
 
-let uspt; // microseconds per tick
+let tempoEvents; // microseconds per tick
+
 let frameSkip = 20;
 let frameCounter = 0;
 
@@ -20,15 +21,16 @@ function setMidiArray(data) {
 function preload() {
   midiArray = loadJSON("./assets/lyrith.json", (data) => {
     noteTracks = interpretMidiEvents(data);
+    tempoEvents = getTempoEvents(data);
   });
 }
 
 function setup() {
+  console.log(tempoEvents);
   updateHW();
   createCanvas(w, h);
 
   piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85]);
-  // console.log(noteTracks);
 }
 
 function draw() {
