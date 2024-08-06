@@ -22,7 +22,6 @@ function setup() {
 function draw() {
   background(25);
   piano.show();
-  // console.log(midiArray);
 }
 
 function loadColors() {
@@ -35,7 +34,6 @@ function loadColors() {
 }
 
 function windowResized() {
-  console.log("Window resized"); // Add this line to check if the function is called
   w = window.innerWidth * 0.95;
   h = w > 1000 ? w / 2 : (9 * w) / 16;
   resizeCanvas(w, h);
