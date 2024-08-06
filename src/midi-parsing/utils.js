@@ -43,52 +43,14 @@ function interpretMidiEvents(midiArray) {
   return notes;
 }
 
-function _addNotesToCanvas(noteTracks, currentTick) {
-  let keyboard = new Array(128).fill("|"); //▮
-  console.clear();
-  for (const noteTrack of noteTracks) {
-    if (noteTrack.length > 0) {
-      for (const note of noteTrack) {
-        if (
-          currentTick >= note.startTime &&
-          currentTick < note.startTime + note.duration
-        ) {
-          keyboard[note.key] = designChar("▮", note.channel);
-        }
-      }
-    }
-  }
-  console.log("Tick: ", currentTick);
-  console.log("\n\n\n\n");
-  console.log(keyboard.join(""));
-}
-
-function designChar(symbol, channel) {
-  return `${scheme[channel - 1]}${symbol}${reset}`;
-}
-
-function visualizeMIDI(noteTracks, tempoEvents, ppq) {
-  let tick = 0;
-
-  function update() {
-    let dTick = checkCurrentTempo(tempoEvents, tick, ppq) * 10;
-    _addNotesToCanvas(noteTracks, tick);
-    // console.log("dTick: ", dTick);
-    tick += dTick;
-    setTimeout(update, 1);
-  }
-
-  update();
-}
-
-function checkCurrentTempo(tempoEvents, tick, ppq) {
+function checkCurrentTempo(tempoEvents, tick) {
   let us;
   for (let i = 0; i < tempoEvents.length; i++) {
     if (tempoEvents[i].startTime <= tick) {
       us = tempoEvents[i].value;
     }
   }
-  return _getTicksPerMillisecond(us, ppq);
+  return us;
 }
 
 function getTempoEvents(tracks) {
@@ -104,8 +66,4 @@ function getTempoEvents(tracks) {
     }
   }
   return tempoEvents;
-}
-
-function _getTicksPerMillisecond(us, ppq) {
-  return Math.round(ppq / (us / 1000));
 }

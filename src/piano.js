@@ -44,12 +44,14 @@ class Piano {
     this.#drawKeys(1);
   }
 
+  // TODO: Change this to private method
   setNote(key, channel) {
     const index = key - this.startKey;
     this.keyboardState[index].channel = channel;
     this.keyboardState[index].playing = true;
   }
 
+  // TODO: Change this to private method
   unsetNote(key, channel) {
     const index = key - this.startKey;
     this.keyboardState[index].channel = null;
@@ -99,7 +101,7 @@ class Piano {
       })
     );
 
-    for (const [i, noteTrack] of noteTracks.entries()) {
+    for (const noteTrack of noteTracks) {
       if (noteTrack.length > 0) {
         for (const note of noteTrack) {
           if (

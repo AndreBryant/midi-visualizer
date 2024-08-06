@@ -1,39 +1,44 @@
 import { MidiParser } from "./node_modules/midi-parser-js/src/midi-parser.js";
 
-let midiArray;
-let noteTracks;
-let piano;
+// Canvas Dimensions
+let w;
+let h;
 
-let w; // Canvas width
-let h; // Canvas height
+// MIDI Data
+let noteTracks;
+let midiArray;
+
+// Piano meta
+let piano;
 const numOfKeys = 88;
 const startKey = 21;
+let tempoEvents;
+let ppq;
 
-let tempoEvents; // microseconds per tick
-
-let frameSkip = 20;
+// Animation frames
+let frameSkip = 0;
 let frameCounter = 0;
-
-function setMidiArray(data) {
-  midiArray = data;
-}
+let fps = 60;
 
 function preload() {
   midiArray = loadJSON("./assets/lyrith.json", (data) => {
     noteTracks = interpretMidiEvents(data);
     tempoEvents = getTempoEvents(data);
+    ppq = data.timeDivision;
   });
 }
 
 function setup() {
-  console.log(tempoEvents);
   updateHW();
   createCanvas(w, h);
-
+  frameRate(fps);
   piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85]);
 }
 
 function draw() {
+  const uspb = checkCurrentTempo(tempoEvents, frameCounter);
+  frameSkip = Math.round((1000000 * ppq) / (uspb * fps));
+
   frameCounter += frameSkip;
   piano.updateKeyboardState(noteTracks, frameCounter);
   if (frameCounter % frameSkip === 0) {
