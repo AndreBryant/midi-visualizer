@@ -4,11 +4,12 @@ let midiArray;
 let noteTracks;
 let piano;
 
-let w;
-let h;
-const numOfKeys = 128;
-const startKey = 0;
+let w; // Canvas width
+let h; // Canvas height
+const numOfKeys = 88;
+const startKey = 21;
 
+let uspt; // microseconds per tick
 let frameSkip = 20;
 let frameCounter = 0;
 
@@ -27,14 +28,14 @@ function setup() {
   createCanvas(w, h);
 
   piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85]);
-  console.log(noteTracks);
+  // console.log(noteTracks);
 }
 
 function draw() {
   frameCounter += frameSkip;
   piano.updateKeyboardState(noteTracks, frameCounter);
   if (frameCounter % frameSkip === 0) {
-    background(25);
+    background(24);
     piano.show();
     piano.drawKeyboardState();
   }

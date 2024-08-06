@@ -7,7 +7,7 @@ class Piano {
   blackKeyWidth;
   blackKeyHeight;
   keyRimColor;
-  keyboardState = []; // make use of this haha
+  keyboardState = [];
   wk = [];
   bk = [];
   colorScheme = [];
@@ -85,7 +85,7 @@ class Piano {
         startPos = wkp * this.blackKeyWidth - this.whiteKeyWidth / 4;
       }
 
-      this.#drawKey({ type, wType }, startPos, this.colorScheme[channel]);
+      this.#drawKey({ type, key, wType }, startPos, this.colorScheme[channel]);
     }
   }
 
@@ -104,7 +104,9 @@ class Piano {
         for (const note of noteTrack) {
           if (
             currentTick >= note.startTime &&
-            currentTick < note.startTime + note.duration
+            currentTick < note.startTime + note.duration &&
+            note.key >= this.startKey &&
+            note.key <= this.lastKey
           ) {
             this.setNote(note.key, note.channel);
           }
@@ -124,7 +126,10 @@ class Piano {
     switch (type) {
       case 0:
         for (let i = 0; i < this.wk.length; i++) {
-          this.#drawKey({ type: 0 }, i * this.whiteKeyWidth);
+          this.#drawKey(
+            { type: 0, key: this.wk[i].key },
+            i * this.whiteKeyWidth
+          );
         }
         break;
       case 1:
@@ -140,7 +145,7 @@ class Piano {
     }
   }
 
-  #drawKey({ type, wType = null }, startPos, channelColor = null) {
+  #drawKey({ type, key = null, wType = null }, startPos, channelColor = null) {
     const h = type ? this.blackKeyHeight : this.whiteKeyHeight;
     const w = this.whiteKeyWidth;
 
@@ -154,6 +159,17 @@ class Piano {
     }
 
     if (!type) {
+      // handle keys and lowest keys
+      if (key === this.startKey && ["left", "inline"].includes(wType)) {
+        if (wType === "inline") wType = "right";
+        if (wType === "left") wType = null;
+      }
+
+      if (key === this.lastKey && ["right", "inline"].includes(wType)) {
+        if (wType === "inline") wType = "left";
+        if (wType === "right") wType = null;
+      }
+
       if (wType) {
         const d = this.whiteKeyWidth / 4;
         switch (wType) {
