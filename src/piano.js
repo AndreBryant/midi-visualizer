@@ -10,13 +10,14 @@ class Piano {
   keyboardState = [];
   wk = [];
   bk = [];
-  colorScheme = [];
+  scheme = [];
 
-  constructor(startKey, lastKey, keyRimColor = 75) {
+  constructor(startKey, lastKey, keyRimColor = 75, scheme) {
     this.startKey = startKey;
     this.lastKey = lastKey;
     this.numofKeys = this.lastKey - this.startKey + 1;
     this.keyRimColor = keyRimColor;
+    this.scheme = scheme;
     for (let i = this.startKey; i <= this.lastKey; i++) {
       if (!this.#checkType(i)) {
         this.wk.push({
@@ -35,7 +36,6 @@ class Piano {
       });
     }
     this.updateDimensions();
-    this.#loadColors();
   }
 
   show() {
@@ -87,7 +87,7 @@ class Piano {
         startPos = wkp * this.blackKeyWidth - this.whiteKeyWidth / 4;
       }
 
-      this.#drawKey({ type, key, wType }, startPos, this.colorScheme[channel]);
+      this.#drawKey({ type, key, wType }, startPos, this.scheme[channel]);
     }
   }
 
@@ -122,6 +122,14 @@ class Piano {
     this.blackKeyWidth = this.whiteKeyWidth;
     this.whiteKeyHeight = height / 5;
     this.blackKeyHeight = this.whiteKeyHeight / 1.5;
+  }
+
+  getKeyboardHeight() {
+    return this.whiteKeyHeight;
+  }
+
+  getKeyWidth(type) {
+    return type ? this.blackKeyWidth : this.whiteKeyWidth;
   }
 
   #drawKeys(type) {
@@ -268,20 +276,7 @@ class Piano {
     );
   }
 
-  #loadColors() {
-    for (let i = 0; i < 16; i++) {
-      const r = Math.round(Math.random() * 255);
-      const g = Math.round(Math.random() * 255);
-      const b = Math.round(Math.random() * 255);
-      this.colorScheme.push(color(r, g, b));
-    }
-  }
-
   #checkType(keyIndex) {
     return ModKeyMappings[keyIndex % 12];
   }
 }
-
-// 0 -> white key
-// 1 -> black key
-const ModKeyMappings = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];

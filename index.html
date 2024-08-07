@@ -23,8 +23,15 @@
   </head>
   <body>
     <script src="node_modules/p5/lib/p5.js"></script>
+    <script src="node_modules/ccapture.js/build/CCapture.all.min.js"></script>
+
+    <script>
+      // 0 -> white key
+      // 1 -> black key
+      const ModKeyMappings = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
+    </script>
     <script src="./src/piano.js"></script>
-    <script src="./src/notes.js"></script>
+    <script src="./src/note.js"></script>
     <script src="./src/midi-parsing/utils.js"></script>
 
     <script src="sketch.js" type="module"></script>

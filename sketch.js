@@ -9,16 +9,27 @@ let noteTracks;
 let midiArray;
 
 // Piano meta
+const numOfKeys = 128;
+const startKey = 0;
 let piano;
-const numOfKeys = 88;
-const startKey = 21;
+let pianoHeight;
 let tempoEvents;
 let ppq;
 
+// Note Canvas
+let noteCanvas;
+let noteWidth;
+let scheme = [];
+
 // Animation frames
-let frameSkip = 0;
-let frameCounter = 0;
+let tickSkip;
+let probeTick = 0;
+let tickCount = 0;
+
+// Video rendering
 let fps = 60;
+let p5Canvas;
+let startMillis;
 
 function preload() {
   midiArray = loadJSON("./assets/lyrith.json", (data) => {
@@ -26,26 +37,50 @@ function preload() {
     tempoEvents = getTempoEvents(data);
     ppq = data.timeDivision;
   });
+  for (let i = 0; i < 16; i++) {
+    const r = Math.round(Math.random() * 255);
+    const g = Math.round(Math.random() * 255);
+    const b = Math.round(Math.random() * 255);
+    scheme.push(color(r, g, b));
+  }
 }
 
 function setup() {
   updateHW();
-  createCanvas(w, h);
   frameRate(fps);
-  piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85]);
+  p5Canvas = createCanvas(w, h);
+
+  piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85], scheme);
+  pianoHeight = piano.getKeyboardHeight();
+  noteWidth = piano.getKeyWidth(0);
+  noteCanvas = new NoteCanvas(
+    pianoHeight,
+    noteWidth,
+    numOfKeys,
+    startKey,
+    scheme
+  );
+
+  tickCount = -(height + pianoHeight);
 }
 
 function draw() {
-  const uspb = checkCurrentTempo(tempoEvents, frameCounter);
-  frameSkip = Math.round((1000000 * ppq) / (uspb * fps));
+  const uspb =
+    checkCurrentTempo(tempoEvents, tickCount) || tempoEvents[0].value;
+  tickSkip = Math.round((1000000 * ppq) / (uspb * fps));
 
-  frameCounter += frameSkip;
-  piano.updateKeyboardState(noteTracks, frameCounter);
-  if (frameCounter % frameSkip === 0) {
-    background(24);
-    piano.show();
-    piano.drawKeyboardState();
-  }
+  probeTick += tickSkip;
+  tickCount += tickSkip;
+
+  background(24);
+
+  noteCanvas.updateCanvas(noteTracks, tickCount, probeTick, tickSkip);
+  noteCanvas.checkNotes();
+  noteCanvas.show();
+
+  piano.updateKeyboardState(noteTracks, tickCount);
+  piano.show();
+  piano.drawKeyboardState();
 }
 
 function windowResized() {
