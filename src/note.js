@@ -75,7 +75,7 @@ class NoteCanvas {
   checkNotes() {
     for (let i = this.notes.length - 1; i >= 0; i--) {
       this.notes[i].updateNote();
-      if (this.notes[i].y === this.boundary) {
+      if (this.notes[i].y >= height - this.boundary) {
         this.notes.splice(i, 1);
       }
     }
@@ -109,7 +109,8 @@ class NoteCanvas {
           const y =
             -note.duration -
             this.boundary -
-            (tickSkip - (probeTick - note.startTime));
+            (tickSkip - (probeTick - note.startTime)) -
+            20;
           const h = note.duration;
           const dy = tickSkip;
           const noteToAdd = new Note(x, y, w, h, this.scheme[note.channel], dy);

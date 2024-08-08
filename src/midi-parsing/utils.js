@@ -44,11 +44,11 @@ function interpretMidiEvents(midiArray) {
 }
 
 function checkCurrentTempo(tempoEvents, tick) {
-  let us;
+  let us = 0;
+  // TODO: fix this
   for (let i = 0; i < tempoEvents.length; i++) {
-    if (tempoEvents[i].startTime <= tick) {
-      us = tempoEvents[i].value;
-    }
+    const t = tempoEvents[i];
+    us = t.startDuration <= tick ? t.value : us;
   }
   return us;
 }

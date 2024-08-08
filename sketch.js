@@ -30,6 +30,8 @@ let tickCount = 0;
 
 // Video rendering
 let fps = 60;
+let capturer;
+let btn;
 let p5Canvas;
 
 // File input
@@ -43,6 +45,22 @@ let togglePlay = document.querySelector("#togglePlay");
 togglePlay.addEventListener("click", () => {
   paused = !paused;
 });
+
+function record() {
+  capturer = new CCapture({ format: "webm", frameRate: 60 });
+  capturer.start();
+
+  paused = false;
+
+  btn.textContent = "cancel recording";
+  btn.onclick = (e) => {
+    capturer.stop();
+    capturer.save();
+    capturer = null;
+    btn.textContent = "Start Recording";
+    btn.onclick = record;
+  };
+}
 
 function preload() {
   for (let i = 0; i < 16; i++) {
@@ -74,7 +92,7 @@ function setup() {
     scheme
   );
 
-  tickCount = -(height + pianoHeight) - delayStart;
+  tickCount = -(height + pianoHeight) - 2 - delayStart;
   probeTick = 0 - delayStart;
 
   if (noteTracks) {
@@ -85,7 +103,9 @@ function setup() {
       const startTime =
         noteTracks[index][noteTracks[index].length - 1]?.startTime;
       const endTime =
-        startTime + noteTracks[index][noteTracks[index].length - 1]?.duration;
+        startTime +
+        noteTracks[index][noteTracks[index].length - 1]?.duration +
+        ppq * 4;
 
       if (endTime > lastTick) lastTick = endTime;
     });
@@ -93,14 +113,23 @@ function setup() {
     piano.setNoteTracks(noteTracks);
     noteCanvas.setNoteTracks(noteTracks);
   }
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.textContent = "start recording";
+    document.body.appendChild(btn);
+    btn.onclick = record;
+    // btn.click(); //start recording automatically
+  }
 }
 
 function draw() {
+  clear();
   background(24);
-  piano.show();
   noteCanvas.show();
+  piano.show();
+  piano.drawKeyboardState();
+
   if (hasMIDIFileLoaded && !paused) {
-    // console.log(paused);
     const uspb =
       checkCurrentTempo(tempoEvents, tickCount) || tempoEvents[0].value;
     tickSkip = Math.round((1000000 * ppq) / (uspb * fps));
@@ -122,6 +151,18 @@ function draw() {
   if (tickCount >= lastTick) {
     hasMIDIFileLoaded = false;
     lastTick = 0;
+    if (capturer) {
+      capturer.stop();
+      capturer.save();
+      capturer = null;
+      btn.textContent = "Start Recording";
+      btn.onclick = record;
+    }
+  }
+
+  if (capturer && tickCount <= lastTick) {
+    requestAnimationFrame(draw);
+    capturer.capture(document.getElementById("defaultCanvas0"));
   }
 }
 
@@ -133,9 +174,14 @@ function windowResized() {
 }
 
 function updateHW() {
-  w = window.innerWidth * 0.95;
+  // w = window.innerWidth * 0.95;
   // h = window.innerHeight * 0.9;
-  h = w > 1000 ? window.innerHeight * 0.9 : (9 * w) / 16;
+  // h = w > 1000 ? window.innerHeight * 0.9 : (9 * w) / 20;
+  // w = 1920;
+  // h = (9 * w) / 16;
+  w = 1080;
+  h = 720;
+  // h = 720;
 }
 
 function handleFile(e) {
@@ -144,7 +190,9 @@ function handleFile(e) {
     midiArray = MidiParser.parse(data);
     hasMIDIFileLoaded = true;
     lastTick = 0;
-    paused = false;
+    paused = true;
+    piano = null;
+    noteCanvas = null;
     noteTracks = interpretMidiEvents(midiArray);
     tempoEvents = getTempoEvents(midiArray);
     ppq = midiArray.timeDivision;
