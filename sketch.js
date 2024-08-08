@@ -23,8 +23,9 @@ let noteWidth;
 let scheme = [];
 
 // Animation frames
+let delayStart = 0;
 let tickSkip;
-let probeTick = 0;
+let probeTick = 0 - delayStart;
 let tickCount = 0;
 
 // Video rendering
@@ -34,6 +35,14 @@ let p5Canvas;
 // File input
 let fileReader;
 let hasMIDIFileLoaded = false;
+
+// Player
+let render;
+let paused = false;
+let togglePlay = document.querySelector("#togglePlay");
+togglePlay.addEventListener("click", () => {
+  paused = !paused;
+});
 
 function preload() {
   for (let i = 0; i < 16; i++) {
@@ -65,11 +74,8 @@ function setup() {
     scheme
   );
 
-  tickCount = -(height + pianoHeight);
-  probeTick = 0;
-  background(24);
-  piano.show();
-  noteCanvas.show();
+  tickCount = -(height + pianoHeight) - delayStart;
+  probeTick = 0 - delayStart;
 
   if (noteTracks) {
     noteTracks.forEach((track, index) => {
@@ -90,7 +96,11 @@ function setup() {
 }
 
 function draw() {
-  if (hasMIDIFileLoaded) {
+  background(24);
+  piano.show();
+  noteCanvas.show();
+  if (hasMIDIFileLoaded && !paused) {
+    // console.log(paused);
     const uspb =
       checkCurrentTempo(tempoEvents, tickCount) || tempoEvents[0].value;
     tickSkip = Math.round((1000000 * ppq) / (uspb * fps));
@@ -124,6 +134,7 @@ function windowResized() {
 
 function updateHW() {
   w = window.innerWidth * 0.95;
+  // h = window.innerHeight * 0.9;
   h = w > 1000 ? window.innerHeight * 0.9 : (9 * w) / 16;
 }
 
@@ -133,6 +144,7 @@ function handleFile(e) {
     midiArray = MidiParser.parse(data);
     hasMIDIFileLoaded = true;
     lastTick = 0;
+    paused = false;
     noteTracks = interpretMidiEvents(midiArray);
     tempoEvents = getTempoEvents(midiArray);
     ppq = midiArray.timeDivision;
