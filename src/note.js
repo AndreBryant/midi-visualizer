@@ -102,7 +102,7 @@ class NoteCanvas {
             const y =
               -note.duration -
               this.boundary -
-              (probeTick - note.startTime) -
+              (tickSkip - (probeTick - note.startTime)) -
               20;
             const h = note.duration;
             const dy = tickSkip;
