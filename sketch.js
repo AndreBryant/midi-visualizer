@@ -7,6 +7,7 @@ let h;
 // MIDI Data
 let noteTracks;
 let midiArray = [];
+let lastTick = 0;
 
 // Piano meta
 const numOfKeys = 128;
@@ -29,7 +30,6 @@ let tickCount = 0;
 // Video rendering
 let fps = 60;
 let p5Canvas;
-let startMillis;
 
 // File input
 let fileReader;
@@ -76,6 +76,12 @@ function setup() {
       noteTracks[index] = track.filter(
         (n) => n.key >= startKey && n.key < startKey + numOfKeys
       );
+      const startTime =
+        noteTracks[index][noteTracks[index].length - 1]?.startTime;
+      const endTime =
+        startTime + noteTracks[index][noteTracks[index].length - 1]?.duration;
+
+      if (endTime > lastTick) lastTick = endTime;
     });
 
     piano.setNoteTracks(noteTracks);
@@ -102,6 +108,11 @@ function draw() {
     piano.show();
     piano.drawKeyboardState();
   }
+
+  if (tickCount >= lastTick) {
+    hasMIDIFileLoaded = false;
+    lastTick = 0;
+  }
 }
 
 function windowResized() {
@@ -121,9 +132,11 @@ function handleFile(e) {
   toBase64(file).then((data) => {
     midiArray = MidiParser.parse(data);
     hasMIDIFileLoaded = true;
+    lastTick = 0;
     noteTracks = interpretMidiEvents(midiArray);
     tempoEvents = getTempoEvents(midiArray);
     ppq = midiArray.timeDivision;
+    preload();
     setup();
   });
 }

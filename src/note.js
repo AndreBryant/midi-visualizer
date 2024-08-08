@@ -61,6 +61,7 @@ class NoteCanvas {
   setNoteTracks(noteTracks) {
     this.noteTracks = noteTracks.slice();
   }
+
   show() {
     for (const note of this.notes) {
       note.show();
@@ -108,8 +109,7 @@ class NoteCanvas {
           const y =
             -note.duration -
             this.boundary -
-            (tickSkip - (probeTick - note.startTime)) -
-            20;
+            (tickSkip - (probeTick - note.startTime));
           const h = note.duration;
           const dy = tickSkip;
           const noteToAdd = new Note(x, y, w, h, this.scheme[note.channel], dy);
