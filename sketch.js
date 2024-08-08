@@ -6,7 +6,7 @@ let h;
 
 // MIDI Data
 let noteTracks;
-let midiArray;
+let midiArray = [];
 
 // Piano meta
 const numOfKeys = 128;
@@ -31,12 +31,11 @@ let fps = 60;
 let p5Canvas;
 let startMillis;
 
+// File input
+let fileReader;
+let hasMIDIFileLoaded = false;
+
 function preload() {
-  midiArray = loadJSON("./assets/lyrith.json", (data) => {
-    noteTracks = interpretMidiEvents(data);
-    tempoEvents = getTempoEvents(data);
-    ppq = data.timeDivision;
-  });
   for (let i = 0; i < 16; i++) {
     const r = Math.round(Math.random() * 255);
     const g = Math.round(Math.random() * 255);
@@ -50,19 +49,10 @@ function setup() {
   frameRate(fps);
   p5Canvas = createCanvas(w, h);
 
-  noteTracks.forEach((track, index) => {
-    noteTracks[index] = track.filter(
-      (n) => n.key >= startKey && n.key < startKey + numOfKeys
-    );
-  });
+  fileReader = select("#filereader");
+  fileReader.changed(handleFile);
 
-  piano = new Piano(
-    startKey,
-    startKey + numOfKeys - 1,
-    [85, 0, 85],
-    scheme,
-    noteTracks
-  );
+  piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85], scheme);
 
   pianoHeight = piano.getKeyboardHeight();
   noteWidth = piano.getKeyWidth(0);
@@ -72,30 +62,46 @@ function setup() {
     noteWidth,
     numOfKeys,
     startKey,
-    scheme,
-    noteTracks
+    scheme
   );
 
   tickCount = -(height + pianoHeight);
+  probeTick = 0;
+  background(24);
+  piano.show();
+  noteCanvas.show();
+
+  if (noteTracks) {
+    noteTracks.forEach((track, index) => {
+      noteTracks[index] = track.filter(
+        (n) => n.key >= startKey && n.key < startKey + numOfKeys
+      );
+    });
+
+    piano.setNoteTracks(noteTracks);
+    noteCanvas.setNoteTracks(noteTracks);
+  }
 }
 
 function draw() {
-  const uspb =
-    checkCurrentTempo(tempoEvents, tickCount) || tempoEvents[0].value;
-  tickSkip = Math.round((1000000 * ppq) / (uspb * fps));
+  if (hasMIDIFileLoaded) {
+    const uspb =
+      checkCurrentTempo(tempoEvents, tickCount) || tempoEvents[0].value;
+    tickSkip = Math.round((1000000 * ppq) / (uspb * fps));
 
-  probeTick += tickSkip;
-  tickCount += tickSkip;
+    probeTick += tickSkip;
+    tickCount += tickSkip;
 
-  background(24);
+    background(24);
 
-  noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
-  noteCanvas.checkNotes();
-  noteCanvas.show();
+    noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
+    noteCanvas.show();
+    noteCanvas.checkNotes();
 
-  piano.updateKeyboardState(tickCount);
-  piano.show();
-  piano.drawKeyboardState();
+    piano.updateKeyboardState(tickCount);
+    piano.show();
+    piano.drawKeyboardState();
+  }
 }
 
 function windowResized() {
@@ -108,6 +114,34 @@ function windowResized() {
 function updateHW() {
   w = window.innerWidth * 0.95;
   h = w > 1000 ? window.innerHeight * 0.9 : (9 * w) / 16;
+}
+
+function handleFile(e) {
+  const file = this.elt.files[0];
+  toBase64(file).then((data) => {
+    midiArray = MidiParser.parse(data);
+    hasMIDIFileLoaded = true;
+    noteTracks = interpretMidiEvents(midiArray);
+    tempoEvents = getTempoEvents(midiArray);
+    ppq = midiArray.timeDivision;
+    setup();
+  });
+}
+
+async function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    var reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = function () {
+      resolve(reader.result);
+    };
+
+    reader.onerror = function (error) {
+      reject(error);
+    };
+  });
 }
 
 window.preload = preload;

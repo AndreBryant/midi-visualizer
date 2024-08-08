@@ -39,13 +39,12 @@ class NoteCanvas {
   wk = [];
   bk = [];
 
-  constructor(boundary, noteWidth, numOfKeys, startKey, scheme, noteTracks) {
+  constructor(boundary, noteWidth, numOfKeys, startKey, scheme) {
     this.boundary = boundary;
     this.noteWidth = noteWidth;
     this.numOfKeys = numOfKeys;
     this.startKey = startKey;
     this.scheme = scheme;
-    this.noteTracks = noteTracks.slice();
     for (let i = this.startKey; i < this.startKey + this.numOfKeys; i++) {
       if (!this.#checkType(i)) {
         this.wk.push({
@@ -59,6 +58,9 @@ class NoteCanvas {
     }
   }
 
+  setNoteTracks(noteTracks) {
+    this.noteTracks = noteTracks.slice();
+  }
   show() {
     for (const note of this.notes) {
       note.show();

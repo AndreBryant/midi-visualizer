@@ -13,13 +13,12 @@ class Piano {
   bk = [];
   scheme = [];
 
-  constructor(startKey, lastKey, keyRimColor = 75, scheme, noteTracks) {
+  constructor(startKey, lastKey, keyRimColor = 75, scheme) {
     this.startKey = startKey;
     this.lastKey = lastKey;
     this.numofKeys = this.lastKey - this.startKey + 1;
     this.keyRimColor = keyRimColor;
     this.scheme = scheme;
-    this.noteTracks = noteTracks.slice();
     for (let i = this.startKey; i <= this.lastKey; i++) {
       if (!this.#checkType(i)) {
         this.wk.push({
@@ -38,6 +37,10 @@ class Piano {
       });
     }
     this.updateDimensions();
+  }
+
+  setNoteTracks(noteTracks) {
+    this.noteTracks = noteTracks.slice();
   }
 
   show() {
