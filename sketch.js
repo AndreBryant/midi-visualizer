@@ -9,8 +9,8 @@ let noteTracks;
 let midiArray;
 
 // Piano meta
-const numOfKeys = 88;
-const startKey = 21;
+const numOfKeys = 128;
+const startKey = 0;
 let piano;
 let pianoHeight;
 let tempoEvents;
@@ -56,15 +56,24 @@ function setup() {
     );
   });
 
-  piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85], scheme);
+  piano = new Piano(
+    startKey,
+    startKey + numOfKeys - 1,
+    [85, 0, 85],
+    scheme,
+    noteTracks
+  );
+
   pianoHeight = piano.getKeyboardHeight();
   noteWidth = piano.getKeyWidth(0);
+
   noteCanvas = new NoteCanvas(
     pianoHeight,
     noteWidth,
     numOfKeys,
     startKey,
-    scheme
+    scheme,
+    noteTracks
   );
 
   tickCount = -(height + pianoHeight);
@@ -80,11 +89,11 @@ function draw() {
 
   background(24);
 
-  noteCanvas.updateCanvas(noteTracks, tickCount, probeTick, tickSkip);
+  noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
   noteCanvas.checkNotes();
   noteCanvas.show();
 
-  piano.updateKeyboardState(noteTracks, tickCount);
+  piano.updateKeyboardState(tickCount);
   piano.show();
   piano.drawKeyboardState();
 }
@@ -93,6 +102,7 @@ function windowResized() {
   updateHW();
   resizeCanvas(w, h);
   piano.updateDimensions();
+  noteCanvas.updateDimensions();
 }
 
 function updateHW() {

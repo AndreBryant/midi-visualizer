@@ -7,17 +7,19 @@ class Piano {
   blackKeyWidth;
   blackKeyHeight;
   keyRimColor;
+  noteTracks = [];
   keyboardState = [];
   wk = [];
   bk = [];
   scheme = [];
 
-  constructor(startKey, lastKey, keyRimColor = 75, scheme) {
+  constructor(startKey, lastKey, keyRimColor = 75, scheme, noteTracks) {
     this.startKey = startKey;
     this.lastKey = lastKey;
     this.numofKeys = this.lastKey - this.startKey + 1;
     this.keyRimColor = keyRimColor;
     this.scheme = scheme;
+    this.noteTracks = noteTracks.slice();
     for (let i = this.startKey; i <= this.lastKey; i++) {
       if (!this.#checkType(i)) {
         this.wk.push({
@@ -91,7 +93,7 @@ class Piano {
     }
   }
 
-  updateKeyboardState(noteTracks, currentTick) {
+  updateKeyboardState(currentTick) {
     this.keyboardState = Array.from(
       { length: this.lastKey - this.startKey + 1 },
       (_, index) => ({
@@ -101,17 +103,17 @@ class Piano {
       })
     );
 
-    for (const noteTrack of noteTracks) {
-      if (noteTrack.length > 0) {
-        for (const note of noteTrack) {
-          if (
-            currentTick >= note.startTime &&
-            currentTick < note.startTime + note.duration &&
-            note.key >= this.startKey &&
-            note.key <= this.lastKey
-          ) {
-            this.setNote(note.key, note.channel);
-          }
+    for (let [i, noteTrack] of this.noteTracks.entries()) {
+      noteTrack = noteTrack.filter(
+        (note) => currentTick < note.startTime + note.duration
+      );
+      this.noteTracks[i] = noteTrack;
+      for (const note of noteTrack) {
+        if (
+          currentTick >= note.startTime &&
+          currentTick < note.startTime + note.duration
+        ) {
+          this.setNote(note.key, note.channel);
         }
       }
     }

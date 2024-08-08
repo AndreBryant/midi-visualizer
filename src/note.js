@@ -34,16 +34,18 @@ class NoteCanvas {
   boundary;
   numOfKeys;
   startKey;
+  noteTracks = [];
   scheme = [];
   wk = [];
   bk = [];
 
-  constructor(boundary, noteWidth, numOfKeys, startKey, scheme) {
+  constructor(boundary, noteWidth, numOfKeys, startKey, scheme, noteTracks) {
     this.boundary = boundary;
     this.noteWidth = noteWidth;
     this.numOfKeys = numOfKeys;
     this.startKey = startKey;
     this.scheme = scheme;
+    this.noteTracks = noteTracks.slice();
     for (let i = this.startKey; i < this.startKey + this.numOfKeys; i++) {
       if (!this.#checkType(i)) {
         this.wk.push({
@@ -76,50 +78,50 @@ class NoteCanvas {
     }
   }
 
-  updateCanvas(noteTracks, currentTick, probeTick, tickSkip) {
-    for (const noteTrack of noteTracks) {
-      if (noteTrack.length > 0) {
-        for (const note of noteTrack) {
-          if (
-            probeTick >= note.startTime &&
-            probeTick < note.startTime + tickSkip
-            // note.key >= this.startKey &&
-            // note.key <= this.startKey + this.numOfKeys - 1
-          ) {
-            let x;
-            let w = this.noteWidth;
+  updateCanvas(currentTick, probeTick, tickSkip) {
+    for (let [i, noteTrack] of this.noteTracks.entries()) {
+      noteTrack = noteTrack.filter(
+        (note) => currentTick < note.startTime + note.duration
+      );
 
-            if (!this.#checkType(note.key)) {
-              const index = this.wk.findIndex((k) => k.i === note.key);
-              x = index * this.noteWidth;
-            } else {
-              const wkp = this.wk.filter((k) => k.i <= note.key).length;
-              x = wkp * this.noteWidth - this.noteWidth / 4;
-              w -= this.noteWidth / 2;
-            }
+      this.noteTracks[i] = noteTrack;
 
-            const y =
-              -note.duration -
-              this.boundary -
-              (tickSkip - (probeTick - note.startTime)) -
-              20;
-            const h = note.duration;
-            const dy = tickSkip;
-            const noteToAdd = new Note(
-              x,
-              y,
-              w,
-              h,
-              this.scheme[note.channel],
-              dy
-            );
-            this.addNote(noteToAdd);
-            // console.log(noteToAdd);
+      for (const note of noteTrack) {
+        if (
+          probeTick >= note.startTime &&
+          probeTick < note.startTime + tickSkip
+        ) {
+          let x;
+          let w = this.noteWidth;
+
+          if (!this.#checkType(note.key)) {
+            const index = this.wk.findIndex((k) => k.i === note.key);
+            x = index * this.noteWidth;
+          } else {
+            const wkp = this.wk.filter((k) => k.i <= note.key).length;
+            x = wkp * this.noteWidth - this.noteWidth / 4;
+            w -= this.noteWidth / 2;
           }
+
+          const y =
+            -note.duration -
+            this.boundary -
+            (tickSkip - (probeTick - note.startTime)) -
+            20;
+          const h = note.duration;
+          const dy = tickSkip;
+          const noteToAdd = new Note(x, y, w, h, this.scheme[note.channel], dy);
+          this.addNote(noteToAdd);
+          // console.log(noteToAdd);
         }
       }
     }
   }
+
+  updateDimensions() {
+    this.noteWidth = width / this.wk.length;
+  }
+
   #checkType(keyIndex) {
     return ModKeyMappings[keyIndex % 12];
   }
