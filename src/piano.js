@@ -253,7 +253,7 @@ class Piano {
         rect(startPos, height - this.whiteKeyHeight, w, h);
       }
     } else {
-      rect(startPos, height - this.whiteKeyHeight - 2, w * 0.55, h + 2);
+      rect(startPos, height - this.whiteKeyHeight - 2, w * 0.55, h + 2, 1);
     }
   }
 

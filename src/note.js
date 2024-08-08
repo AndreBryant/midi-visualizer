@@ -19,7 +19,7 @@ class Note {
   show() {
     stroke(255);
     fill(this.color);
-    rect(this.x, this.y, this.width, this.height);
+    rect(this.x, this.y, this.width, this.height, 2);
   }
 
   updateNote() {
