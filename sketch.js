@@ -9,8 +9,8 @@ let noteTracks;
 let midiArray;
 
 // Piano meta
-const numOfKeys = 128;
-const startKey = 0;
+const numOfKeys = 88;
+const startKey = 21;
 let piano;
 let pianoHeight;
 let tempoEvents;
@@ -49,6 +49,12 @@ function setup() {
   updateHW();
   frameRate(fps);
   p5Canvas = createCanvas(w, h);
+
+  noteTracks.forEach((track, index) => {
+    noteTracks[index] = track.filter(
+      (n) => n.key >= startKey && n.key < startKey + numOfKeys
+    );
+  });
 
   piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85], scheme);
   pianoHeight = piano.getKeyboardHeight();

@@ -31,8 +31,6 @@ class Note {
 class NoteCanvas {
   notes = [];
   noteWidth;
-  // wNoteWidth;
-  // bNoteWidth;
   boundary;
   numOfKeys;
   startKey;
@@ -46,7 +44,7 @@ class NoteCanvas {
     this.numOfKeys = numOfKeys;
     this.startKey = startKey;
     this.scheme = scheme;
-    for (let i = this.startKey; i < this.numOfKeys; i++) {
+    for (let i = this.startKey; i < this.startKey + this.numOfKeys; i++) {
       if (!this.#checkType(i)) {
         this.wk.push({
           i,
@@ -84,12 +82,13 @@ class NoteCanvas {
         for (const note of noteTrack) {
           if (
             probeTick >= note.startTime &&
-            probeTick < note.startTime + tickSkip &&
-            note.key >= this.startKey &&
-            note.key <= this.startKey + this.numOfKeys - 1
+            probeTick < note.startTime + tickSkip
+            // note.key >= this.startKey &&
+            // note.key <= this.startKey + this.numOfKeys - 1
           ) {
             let x;
             let w = this.noteWidth;
+
             if (!this.#checkType(note.key)) {
               const index = this.wk.findIndex((k) => k.i === note.key);
               x = index * this.noteWidth;
