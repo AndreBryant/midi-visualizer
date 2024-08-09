@@ -116,7 +116,7 @@ class NoteCanvas {
             tickSkip;
           const h = note.duration;
           const dy = tickSkip;
-          const noteToAdd = new Note(x, y, w, h, this.scheme[note.channel], dy);
+          const noteToAdd = new Note(x, y, w, h, this.scheme[i], dy);
           this.addNote(noteToAdd);
           // console.log(noteToAdd);
         }

@@ -7,6 +7,7 @@ let h;
 // MIDI Data
 let noteTracks;
 let midiArray = [];
+let numOfTracks;
 let lastTick = 0;
 
 // Piano meta
@@ -62,8 +63,9 @@ function record() {
   };
 }
 
-function preload() {
-  for (let i = 0; i < 16; i++) {
+function loadColors() {
+  scheme = [];
+  for (let i = 0; i < numOfTracks; i++) {
     const r = Math.round(Math.random() * 255);
     const g = Math.round(Math.random() * 255);
     const b = Math.round(Math.random() * 255);
@@ -137,7 +139,7 @@ function draw() {
     probeTick += tickSkip;
     tickCount += tickSkip;
 
-    // console.log(`currentTempo: ${uspb}`, probeTick, tickCount, tickSkip);
+    console.log(tickSkip);
     background(24);
 
     noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
@@ -195,10 +197,11 @@ function handleFile(e) {
     piano = null;
     noteCanvas = null;
     noteTracks = interpretMidiEvents(midiArray);
+    numOfTracks = noteTracks.length;
     tempoEvents = getTempoEvents(midiArray);
     console.log(tempoEvents);
     ppq = midiArray.timeDivision;
-    preload();
+    loadColors();
     setup();
   });
 }
@@ -227,18 +230,19 @@ function checkCurrentTempo(tempoEvents, tick) {
     us = tempoEvents[i].value;
     i++;
   }
-  console.log(us);
   return us;
 }
 
 function getTempoEvents(tracks) {
   let tempoEvents = [];
+  let tWallTime = 0;
   for (const track of tracks.track) {
     for (const event of track.event) {
+      tWallTime += event.deltaTime;
       if (event.metaType && event.metaType === 81) {
         tempoEvents.push({
           value: event.data,
-          startTime: event.deltaTime,
+          startTime: tWallTime,
         });
       }
     }
@@ -246,7 +250,7 @@ function getTempoEvents(tracks) {
   return tempoEvents;
 }
 
-window.preload = preload;
+window.preload = loadColors;
 window.setup = setup;
 window.draw = draw;
 window.windowResized = windowResized;

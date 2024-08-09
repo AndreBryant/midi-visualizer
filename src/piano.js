@@ -32,7 +32,7 @@ class Piano {
 
       this.keyboardState.push({
         key: i,
-        channel: null,
+        track: null,
         playing: false,
       });
     }
@@ -50,16 +50,16 @@ class Piano {
   }
 
   // TODO: Change this to private method
-  setNote(key, channel) {
+  setNote(key, track) {
     const index = key - this.startKey;
-    this.keyboardState[index].channel = channel;
+    this.keyboardState[index].track = track;
     this.keyboardState[index].playing = true;
   }
 
   // TODO: Change this to private method
-  unsetNote(key, channel) {
+  unsetNote(key, track) {
     const index = key - this.startKey;
-    this.keyboardState[index].channel = null;
+    this.keyboardState[index].track = null;
     this.keyboardState[index].playing = false;
   }
 
@@ -67,7 +67,7 @@ class Piano {
     for (let i = 0; i < this.keyboardState.length; i++) {
       if (!this.keyboardState[i].playing) continue;
 
-      const { key, channel } = this.keyboardState[i];
+      const { key, track } = this.keyboardState[i];
       const type = this.#checkType(key);
       let startPos;
       let wType = null;
@@ -92,7 +92,7 @@ class Piano {
         startPos = wkp * this.blackKeyWidth - this.whiteKeyWidth / 4;
       }
 
-      this.#drawKey({ type, key, wType }, startPos, this.scheme[channel]);
+      this.#drawKey({ type, key, wType }, startPos, this.scheme[track]);
     }
   }
 
@@ -116,7 +116,7 @@ class Piano {
           currentTick >= note.startTime &&
           currentTick < note.startTime + note.duration
         ) {
-          this.setNote(note.key, note.channel);
+          this.setNote(note.key, i);
         }
       }
     }
