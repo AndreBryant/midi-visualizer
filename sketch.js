@@ -132,11 +132,12 @@ function draw() {
   if (hasMIDIFileLoaded && !paused) {
     const uspb =
       checkCurrentTempo(tempoEvents, tickCount) || tempoEvents[0].value;
-    tickSkip = Math.round((1000000 * ppq) / (uspb * fps));
+    tickSkip = (1000000 * ppq) / (uspb * fps);
 
     probeTick += tickSkip;
     tickCount += tickSkip;
 
+    // console.log(`currentTempo: ${uspb}`, probeTick, tickCount, tickSkip);
     background(24);
 
     noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
@@ -195,6 +196,7 @@ function handleFile(e) {
     noteCanvas = null;
     noteTracks = interpretMidiEvents(midiArray);
     tempoEvents = getTempoEvents(midiArray);
+    console.log(tempoEvents);
     ppq = midiArray.timeDivision;
     preload();
     setup();
@@ -215,6 +217,33 @@ async function toBase64(file) {
       reject(error);
     };
   });
+}
+
+function checkCurrentTempo(tempoEvents, tick) {
+  let us = 0;
+  let i = 0;
+
+  while (i < tempoEvents.length && tick > tempoEvents[i].startTime) {
+    us = tempoEvents[i].value;
+    i++;
+  }
+  console.log(us);
+  return us;
+}
+
+function getTempoEvents(tracks) {
+  let tempoEvents = [];
+  for (const track of tracks.track) {
+    for (const event of track.event) {
+      if (event.metaType && event.metaType === 81) {
+        tempoEvents.push({
+          value: event.data,
+          startTime: event.deltaTime,
+        });
+      }
+    }
+  }
+  return tempoEvents;
 }
 
 window.preload = preload;

@@ -18,6 +18,7 @@ class Note {
 
   show() {
     stroke(255);
+    strokeWeight(1.5);
     fill(this.color);
     rect(this.x, this.y, this.width, this.height, 2);
   }
@@ -29,6 +30,7 @@ class Note {
 }
 
 class NoteCanvas {
+  MAX_NOTES_ON_SCREEN = 10000;
   notes = [];
   noteWidth;
   boundary;
@@ -69,6 +71,7 @@ class NoteCanvas {
   }
 
   addNote(note) {
+    if (this.notes.length >= this.MAX_NOTES_ON_SCREEN) this.notes.shift();
     this.notes.push(note);
   }
 
@@ -110,7 +113,7 @@ class NoteCanvas {
             -note.duration -
             this.boundary -
             (tickSkip - (probeTick - note.startTime)) -
-            20;
+            tickSkip;
           const h = note.duration;
           const dy = tickSkip;
           const noteToAdd = new Note(x, y, w, h, this.scheme[note.channel], dy);

@@ -42,28 +42,3 @@ function interpretMidiEvents(midiArray) {
 
   return notes;
 }
-
-function checkCurrentTempo(tempoEvents, tick) {
-  let us = 0;
-  // TODO: fix this
-  for (let i = 0; i < tempoEvents.length; i++) {
-    const t = tempoEvents[i];
-    us = t.startDuration <= tick ? t.value : us;
-  }
-  return us;
-}
-
-function getTempoEvents(tracks) {
-  let tempoEvents = [];
-  for (const track of tracks.track) {
-    for (const event of track.event) {
-      if (event.metaType && event.metaType === 81) {
-        tempoEvents.push({
-          value: event.data,
-          startTime: event.deltaTime,
-        });
-      }
-    }
-  }
-  return tempoEvents;
-}

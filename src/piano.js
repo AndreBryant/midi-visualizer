@@ -169,6 +169,8 @@ class Piano {
 
     if (channelColor) {
       fill(channelColor);
+      stroke(127);
+      strokeWeight(1.5);
     } else {
       fill(type ? 0 : 255);
     }
@@ -184,7 +186,6 @@ class Piano {
         if (wType === "inline") wType = "left";
         if (wType === "right") wType = null;
       }
-
       if (wType) {
         const d = this.whiteKeyWidth / 4;
         switch (wType) {
