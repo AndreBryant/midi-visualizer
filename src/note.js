@@ -27,6 +27,10 @@ class Note {
     this.x += this.dx;
     this.y += this.dy;
   }
+
+  setDy(dy) {
+    this.dy = dy;
+  }
 }
 
 class NoteCanvas {
@@ -64,6 +68,12 @@ class NoteCanvas {
     this.noteTracks = noteTracks.slice();
   }
 
+  setNoteSpeed(dy) {
+    for (const note of this.notes) {
+      note.setDy(dy);
+    }
+  }
+
   show() {
     for (const note of this.notes) {
       note.show();
@@ -85,6 +95,7 @@ class NoteCanvas {
   }
 
   updateCanvas(currentTick, probeTick, tickSkip) {
+    this.setNoteSpeed(tickSkip);
     for (let [i, noteTrack] of this.noteTracks.entries()) {
       noteTrack = noteTrack.filter(
         (note) => currentTick < note.startTime + note.duration

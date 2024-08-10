@@ -79,7 +79,8 @@ function setup() {
   p5Canvas = createCanvas(w, h);
 
   fileReader = select("#filereader");
-  fileReader.changed(handleFile);
+  fileReader.elt.removeEventListener("change", handleFile);
+  fileReader.elt.addEventListener("change", handleFile);
 
   piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85], scheme);
 
@@ -138,8 +139,8 @@ function draw() {
 
     probeTick += tickSkip;
     tickCount += tickSkip;
+    console.log(tickSkip, uspb, lastTick);
 
-    console.log(tickSkip);
     background(24);
 
     noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
@@ -188,7 +189,7 @@ function updateHW() {
 }
 
 function handleFile(e) {
-  const file = this.elt.files[0];
+  const file = this.files[0];
   toBase64(file).then((data) => {
     midiArray = MidiParser.parse(data);
     hasMIDIFileLoaded = true;
