@@ -7,35 +7,41 @@
     <style>
       body {
         margin: 0;
-        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        align-items: center;
       }
 
-      canvas {
+      #sketch-holder {
+        overflow-x: auto;
         border: 1px solid black;
       }
-
-      .menu {
-        position: absolute;
-        right: 0;
-        color: white;
-      }
     </style>
-  </head>
-  <body>
     <script src="node_modules/p5/lib/p5.js"></script>
     <script src="node_modules/ccapture.js/build/CCapture.all.min.js"></script>
-
     <script>
       // 0 -> white key
       // 1 -> black key
       const ModKeyMappings = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
     </script>
-    <script src="./src/piano.js"></script>
-    <script src="./src/note.js"></script>
+    <script src="./src/classes/piano.js" type="module"></script>
+    <script src="./src/classes/note.js" type="module"></script>
     <script src="./src/midi-parsing/utils.js"></script>
 
+    <script src="./src/scripts/fileHandling.js" type="module"></script>
+    <script src="./src/scripts/scheme.js" type="module"></script>
+
     <script src="sketch.js" type="module"></script>
+  </head>
+  <body>
+    <div id="sketch-holder"></div>
+    <label for="seekBar">Time Stamp in ticks here</label>
+    <input type="range" name="seekBar" id="seekBar" />
     <button type="button" id="togglePlay">Play/Pause</button>
+    <button type="button" id="canvasToggler">Show/hide Canvas</button>
+    <button type="button" id="renderStarter">Start Render</button>
     <div class="menu">
       <label for="filereader">File:</label>
       <input type="file" id="filereader" name="filereader" accept=".mid" />

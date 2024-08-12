@@ -1,8 +1,14 @@
+import { loadColors } from "./src/scripts/scheme.js";
+import { Piano } from "./src/classes/piano.js";
+import { NoteCanvas } from "./src/classes/note.js";
 import { MidiParser } from "./node_modules/midi-parser-js/src/midi-parser.js";
 
 // Canvas Dimensions
 let w;
 let h;
+
+// scheme
+let scheme = [];
 
 // MIDI Data
 let noteTracks;
@@ -21,7 +27,6 @@ let ppq;
 // Note Canvas
 let noteCanvas;
 let noteWidth;
-let scheme = [];
 
 // Animation frames
 let delayStart = 0;
@@ -46,7 +51,26 @@ let togglePlay = document.querySelector("#togglePlay");
 togglePlay.addEventListener("click", () => {
   paused = !paused;
 });
+let canvasToggler = document.querySelector("#canvasToggler");
+canvasToggler.addEventListener("click", toggleCanvas);
+let seekBar = document.querySelector("#seekBar");
 
+// player
+function toggleCanvas() {
+  if (!isElementHidden(p5Canvas)) {
+    p5Canvas.hide();
+  } else {
+    p5Canvas.show();
+  }
+}
+
+// player
+function isElementHidden(element) {
+  const style = window.getComputedStyle(element.elt);
+  return style.display === "none" || style.visibility === "hidden";
+}
+
+// animation
 function record() {
   capturer = new CCapture({ format: "webm", frameRate: 60 });
   capturer.start();
@@ -58,25 +82,16 @@ function record() {
     capturer.stop();
     capturer.save();
     capturer = null;
-    btn.textContent = "Start Recording";
+    btn.textContent = "Start Render";
     btn.onclick = record;
   };
-}
-
-function loadColors() {
-  scheme = [];
-  for (let i = 0; i < numOfTracks; i++) {
-    const r = Math.round(Math.random() * 255);
-    const g = Math.round(Math.random() * 255);
-    const b = Math.round(Math.random() * 255);
-    scheme.push(color(r, g, b));
-  }
 }
 
 function setup() {
   updateHW();
   frameRate(fps);
   p5Canvas = createCanvas(w, h);
+  p5Canvas.parent("sketch-holder");
 
   fileReader = select("#filereader");
   fileReader.elt.removeEventListener("change", handleFile);
@@ -117,9 +132,7 @@ function setup() {
     noteCanvas.setNoteTracks(noteTracks);
   }
   if (!btn) {
-    btn = document.createElement("button");
-    btn.textContent = "start recording";
-    document.body.appendChild(btn);
+    btn = document.querySelector("#renderStarter");
     btn.onclick = record;
     // btn.click(); //start recording automatically
   }
@@ -139,7 +152,6 @@ function draw() {
 
     probeTick += tickSkip;
     tickCount += tickSkip;
-    console.log(tickSkip, uspb, lastTick);
 
     background(24);
 
@@ -178,49 +190,8 @@ function windowResized() {
 }
 
 function updateHW() {
-  // w = window.innerWidth * 0.95;
-  // h = window.innerHeight * 0.9;
-  // h = w > 1000 ? window.innerHeight * 0.9 : (9 * w) / 20;
-  // w = 1920;
-  // h = (9 * w) / 16;
-  w = 1080;
+  w = 1280;
   h = 720;
-  // h = 720;
-}
-
-function handleFile(e) {
-  const file = this.files[0];
-  toBase64(file).then((data) => {
-    midiArray = MidiParser.parse(data);
-    hasMIDIFileLoaded = true;
-    lastTick = 0;
-    paused = true;
-    piano = null;
-    noteCanvas = null;
-    noteTracks = interpretMidiEvents(midiArray);
-    numOfTracks = noteTracks.length;
-    tempoEvents = getTempoEvents(midiArray);
-    console.log(tempoEvents);
-    ppq = midiArray.timeDivision;
-    loadColors();
-    setup();
-  });
-}
-
-async function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    var reader = new FileReader();
-
-    reader.readAsDataURL(file);
-
-    reader.onload = function () {
-      resolve(reader.result);
-    };
-
-    reader.onerror = function (error) {
-      reject(error);
-    };
-  });
 }
 
 function checkCurrentTempo(tempoEvents, tick) {
@@ -251,7 +222,42 @@ function getTempoEvents(tracks) {
   return tempoEvents;
 }
 
-window.preload = loadColors;
+function handleFile(e) {
+  const file = this.files[0];
+  toBase64(file).then((data) => {
+    midiArray = MidiParser.parse(data);
+    hasMIDIFileLoaded = true;
+    lastTick = 0;
+    paused = true;
+    p5Canvas = null;
+    piano = null;
+    noteCanvas = null;
+    noteTracks = interpretMidiEvents(midiArray);
+    numOfTracks = noteTracks.length;
+    tempoEvents = getTempoEvents(midiArray);
+    console.log(tempoEvents);
+    ppq = midiArray.timeDivision;
+    scheme = loadColors(numOfTracks);
+    setup();
+  });
+}
+
+async function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    var reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = function () {
+      resolve(reader.result);
+    };
+
+    reader.onerror = function (error) {
+      reject(error);
+    };
+  });
+}
+
 window.setup = setup;
 window.draw = draw;
 window.windowResized = windowResized;

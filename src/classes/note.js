@@ -33,7 +33,7 @@ class Note {
   }
 }
 
-class NoteCanvas {
+export class NoteCanvas {
   MAX_NOTES_ON_SCREEN = 10000;
   notes = [];
   noteWidth;
