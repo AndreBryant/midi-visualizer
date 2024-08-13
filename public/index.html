@@ -19,28 +19,12 @@
         border: 1px solid black;
       }
     </style>
-    <script src="node_modules/p5/lib/p5.js"></script>
-    <script src="node_modules/ccapture.js/build/CCapture.all.min.js"></script>
-    <script>
-      // 0 -> white key
-      // 1 -> black key
-      const ModKeyMappings = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
-      // const ModKeyMappings = [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1];
-    </script>
-    <script src="./src/classes/piano.js" type="module"></script>
-    <script src="./src/classes/note.js" type="module"></script>
-    <script src="./src/midi-parsing/utils.js" type="module"></script>
-    <script src="./src/scripts/filePlayer.js" type="module"></script>
-
-    <script src="./src/scripts/fileHandling.js" type="module"></script>
-    <script src="./src/scripts/webmHandler.js" type="module"></script>
-    <script src="./src/scripts/scheme.js" type="module"></script>
-
-    <script src="sketch.js" type="module"></script>
+    <script src="../sketch.js" type="module"></script>
   </head>
+
   <body>
     <div id="sketch-holder"></div>
-    <label for="seekBar">Time Stamp in ticks here</label>
+    <label for="seeker">Time Stamp in ticks here</label>
     <input type="range" name="seeker" id="seeker" min="0" max="0" values="0" />
     <button type="button" id="togglePlay">Play/Pause</button>
     <button type="button" id="canvasToggler">Show/hide Canvas</button>

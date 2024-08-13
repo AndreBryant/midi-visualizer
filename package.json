@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack sketch.js"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +16,9 @@
     "ccapture.js-npmfixed": "^1.1.0",
     "midi-parser-js": "^4.0.4",
     "p5": "^1.10.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4"
   }
 }

@@ -1,3 +1,5 @@
+const ModKeyMappings = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
+
 class Note {
   x;
   y;
