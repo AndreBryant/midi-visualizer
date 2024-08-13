@@ -10,6 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.10",
+    "@ffmpeg/util": "^0.12.1",
     "ccapture.js": "^1.1.0",
     "ccapture.js-npmfixed": "^1.1.0",
     "midi-parser-js": "^4.0.4",

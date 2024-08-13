@@ -8,6 +8,7 @@ import {
   getTempoEvents,
   checkCurrentTempo,
 } from "./src/midi-parsing/utils.js";
+import { saveAsMp4 } from "./src/scripts/webmHandler.js";
 
 // Canvas Dimensions
 let w;
@@ -60,6 +61,9 @@ let togglePlay;
 let canvasToggler;
 
 let seeker;
+
+// camera
+let cam;
 
 function pause() {
   paused = !paused;
@@ -150,6 +154,7 @@ function draw() {
     tickCount += tickSkip;
 
     seeker.value(tickCount);
+
     background(24);
 
     noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
@@ -162,11 +167,10 @@ function draw() {
   }
 
   if (tickCount >= lastTick) {
-    hasMIDIFileLoaded = false;
-    lastTick = 0;
+    paused = true;
     if (capturer) {
       capturer.stop();
-      capturer.save();
+      capturer.save(saveAsMp4);
       capturer = null;
       recorder.textContent = "Start Recording";
       recorder.onclick = record;
@@ -193,7 +197,7 @@ function updateHW() {
 
 // animation
 function record() {
-  capturer = new CCapture({ format: "webm", frameRate: 60 });
+  capturer = new CCapture({ format: "webm", framerate: 60 });
   capturer.start();
 
   paused = false;
@@ -201,7 +205,7 @@ function record() {
   recorder.textContent = "cancel recording";
   recorder.onclick = (e) => {
     capturer.stop();
-    capturer.save();
+    capturer.save(saveAsMp4);
     capturer = null;
     recorder.textContent = "Start recording";
     recorder.onclick = record;
