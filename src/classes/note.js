@@ -101,8 +101,6 @@ export class NoteCanvas {
         (note) => currentTick < note.startTime + note.duration
       );
 
-      this.noteTracks[i] = noteTrack;
-
       for (const note of noteTrack) {
         if (
           probeTick >= note.startTime &&
@@ -129,7 +127,6 @@ export class NoteCanvas {
           const dy = tickSkip;
           const noteToAdd = new Note(x, y, w, h, this.scheme[i], dy);
           this.addNote(noteToAdd);
-          // console.log(noteToAdd);
         }
       }
     }

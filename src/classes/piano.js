@@ -110,7 +110,7 @@ export class Piano {
       noteTrack = noteTrack.filter(
         (note) => currentTick < note.startTime + note.duration
       );
-      this.noteTracks[i] = noteTrack;
+
       for (const note of noteTrack) {
         if (
           currentTick >= note.startTime &&

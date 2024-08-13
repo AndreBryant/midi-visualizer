@@ -29,6 +29,7 @@
     <script src="./src/classes/piano.js" type="module"></script>
     <script src="./src/classes/note.js" type="module"></script>
     <script src="./src/midi-parsing/utils.js" type="module"></script>
+    <script src="./src/scripts/filePlayer.js" type="module"></script>
 
     <script src="./src/scripts/fileHandling.js" type="module"></script>
     <script src="./src/scripts/scheme.js" type="module"></script>
@@ -38,10 +39,10 @@
   <body>
     <div id="sketch-holder"></div>
     <label for="seekBar">Time Stamp in ticks here</label>
-    <input type="range" name="seekBar" id="seekBar" />
+    <input type="range" name="seeker" id="seeker" min="0" max="0" values="0" />
     <button type="button" id="togglePlay">Play/Pause</button>
     <button type="button" id="canvasToggler">Show/hide Canvas</button>
-    <button type="button" id="renderStarter">Start Render</button>
+    <button type="button" id="renderStarter">Start Recording</button>
     <div class="menu">
       <label for="filereader">File:</label>
       <input type="file" id="filereader" name="filereader" accept=".mid" />

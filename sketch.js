@@ -1,7 +1,8 @@
-import { loadColors } from "./src/scripts/scheme.js";
-import { Piano } from "./src/classes/piano.js";
-import { NoteCanvas } from "./src/classes/note.js";
 import { MidiParser } from "./node_modules/midi-parser-js/src/midi-parser.js";
+import { toggleCanvas } from "./src/scripts/filePlayer.js";
+import { loadColors } from "./src/scripts/scheme.js";
+import { NoteCanvas } from "./src/classes/note.js";
+import { Piano } from "./src/classes/piano.js";
 import {
   interpretMidiEvents,
   getTempoEvents,
@@ -37,13 +38,14 @@ let noteWidth;
 // Animation frames
 let delayStart = 0;
 let tickSkip;
+let probeDiff;
 let probeTick = 0 - delayStart;
 let tickCount = 0;
 
 // Video rendering
 let fps = 60;
 let capturer;
-let btn;
+let recorder;
 let p5Canvas;
 
 // File input
@@ -51,48 +53,16 @@ let fileReader;
 let hasMIDIFileLoaded = false;
 
 // Player
-let render;
 let paused = false;
 
-let togglePlay = document.querySelector("#togglePlay");
-togglePlay.addEventListener("click", () => {
+let togglePlay;
+
+let canvasToggler;
+
+let seeker;
+
+function pause() {
   paused = !paused;
-});
-
-let canvasToggler = document.querySelector("#canvasToggler");
-canvasToggler.addEventListener("click", toggleCanvas);
-let seekBar = document.querySelector("#seekBar");
-
-// player
-function toggleCanvas() {
-  if (!isElementHidden(p5Canvas)) {
-    p5Canvas.hide();
-  } else {
-    p5Canvas.show();
-  }
-}
-
-// player
-function isElementHidden(element) {
-  const style = window.getComputedStyle(element.elt);
-  return style.display === "none" || style.visibility === "hidden";
-}
-
-// animation
-function record() {
-  capturer = new CCapture({ format: "webm", frameRate: 60 });
-  capturer.start();
-
-  paused = false;
-
-  btn.textContent = "cancel recording";
-  btn.onclick = (e) => {
-    capturer.stop();
-    capturer.save();
-    capturer = null;
-    btn.textContent = "Start Render";
-    btn.onclick = record;
-  };
 }
 
 function setup() {
@@ -104,6 +74,16 @@ function setup() {
   fileReader = select("#filereader");
   fileReader.elt.removeEventListener("change", handleFile);
   fileReader.elt.addEventListener("change", handleFile);
+
+  togglePlay = select("#togglePlay");
+  togglePlay.elt.removeEventListener("click", pause);
+  togglePlay.elt.addEventListener("click", pause);
+
+  canvasToggler = select("#canvasToggler");
+  canvasToggler.elt.removeEventListener("click", () => toggleCanvas(p5Canvas));
+  canvasToggler.elt.addEventListener("click", () => toggleCanvas(p5Canvas));
+
+  seeker = select("#seeker");
 
   piano = new Piano(startKey, numOfKeys, rimColor, scheme);
 
@@ -118,7 +98,8 @@ function setup() {
     scheme
   );
 
-  tickCount = -(height + pianoHeight) - 2 - delayStart;
+  probeDiff = -(height + pianoHeight) - 2;
+  tickCount = probeDiff - delayStart;
   probeTick = 0 - delayStart;
 
   if (noteTracks) {
@@ -136,13 +117,20 @@ function setup() {
       if (endTime > lastTick) lastTick = endTime;
     });
 
+    seeker.attribute("max", lastTick);
+    seeker.attribute("min", 0);
+    seeker.changed(() => {
+      const val = seeker.value();
+      probeTick = val;
+      tickCount = probeTick + probeDiff;
+    });
+
     piano.setNoteTracks(noteTracks);
     noteCanvas.setNoteTracks(noteTracks);
   }
-  if (!btn) {
-    btn = document.querySelector("#renderStarter");
-    btn.onclick = record;
-    // btn.click(); //start recording automatically
+  if (!recorder) {
+    recorder = document.querySelector("#renderStarter");
+    recorder.onclick = record;
   }
 }
 
@@ -179,8 +167,8 @@ function draw() {
       capturer.stop();
       capturer.save();
       capturer = null;
-      btn.textContent = "Start Recording";
-      btn.onclick = record;
+      recorder.textContent = "Start Recording";
+      recorder.onclick = record;
     }
   }
 
@@ -200,6 +188,23 @@ function windowResized() {
 function updateHW() {
   w = 1280;
   h = 720;
+}
+
+// animation
+function record() {
+  capturer = new CCapture({ format: "webm", frameRate: 60 });
+  capturer.start();
+
+  paused = false;
+
+  recorder.textContent = "cancel recording";
+  recorder.onclick = (e) => {
+    capturer.stop();
+    capturer.save();
+    capturer = null;
+    recorder.textContent = "Start recording";
+    recorder.onclick = record;
+  };
 }
 
 function handleFile(e) {
