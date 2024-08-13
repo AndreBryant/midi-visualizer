@@ -149,6 +149,7 @@ function draw() {
     probeTick += tickSkip;
     tickCount += tickSkip;
 
+    seeker.value(tickCount);
     background(24);
 
     noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
