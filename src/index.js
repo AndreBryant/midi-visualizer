@@ -1,19 +1,19 @@
-import "./node_modules/p5/lib/p5.js";
-import "./node_modules/ccapture.js/src/CCapture.js";
-import "./node_modules/ccapture.js/src/download.js";
-import "./node_modules/ccapture.js/src/webm-writer-0.2.0.js";
+import "../node_modules/p5/lib/p5.js";
+import "../node_modules/ccapture.js/src/CCapture.js";
+import "../node_modules/ccapture.js/src/download.js";
+import "../node_modules/ccapture.js/src/webm-writer-0.2.0.js";
 
-import { MidiParser } from "./node_modules/midi-parser-js/src/midi-parser.js";
-import { toggleCanvas } from "./src/scripts/filePlayer.js";
-import { loadColors } from "./src/scripts/scheme.js";
-import { NoteCanvas } from "./src/classes/note.js";
-import { Piano } from "./src/classes/piano.js";
+import { MidiParser } from "../node_modules/midi-parser-js/src/midi-parser.js";
+import { toggleCanvas } from "../src/scripts/filePlayer.js";
+import { loadColors } from "../src/scripts/scheme.js";
+import { NoteCanvas } from "../src/classes/note.js";
+import { Piano } from "../src/classes/piano.js";
 import {
   interpretMidiEvents,
   getTempoEvents,
   checkCurrentTempo,
-} from "./src/midi-parsing/utils.js";
-import { saveAsMp4 } from "./src/scripts/webmHandler.js";
+} from "./midi-parsing/utils.js";
+import { saveAsMp4 } from "./scripts/webmHandler.js";
 
 // Canvas Dimensions
 let w;
