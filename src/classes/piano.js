@@ -13,10 +13,10 @@ export class Piano {
   bk = [];
   scheme = [];
 
-  constructor(startKey, lastKey, keyRimColor = 75, scheme) {
+  constructor(startKey, numOfKeys, keyRimColor = 75, scheme) {
     this.startKey = startKey;
-    this.lastKey = lastKey;
-    this.numofKeys = this.lastKey - this.startKey + 1;
+    this.numOfKeys = numOfKeys;
+    this.lastKey = this.startKey + this.numOfKeys - 1;
     this.keyRimColor = keyRimColor;
     this.scheme = scheme;
     for (let i = this.startKey; i <= this.lastKey; i++) {

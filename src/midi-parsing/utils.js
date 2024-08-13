@@ -1,4 +1,4 @@
-function interpretMidiEvents(midiArray) {
+export function interpretMidiEvents(midiArray) {
   let notes = [];
   for (const track of midiArray.track) {
     let nWallTime = 0;
@@ -41,4 +41,32 @@ function interpretMidiEvents(midiArray) {
   }
 
   return notes;
+}
+
+export function checkCurrentTempo(tempoEvents, tick) {
+  let us = 0;
+  let i = 0;
+
+  while (i < tempoEvents.length && tick > tempoEvents[i].startTime) {
+    us = tempoEvents[i].value;
+    i++;
+  }
+  return us;
+}
+
+export function getTempoEvents(tracks) {
+  let tempoEvents = [];
+  let tWallTime = 0;
+  for (const track of tracks.track) {
+    for (const event of track.event) {
+      tWallTime += event.deltaTime;
+      if (event.metaType && event.metaType === 81) {
+        tempoEvents.push({
+          value: event.data,
+          startTime: tWallTime,
+        });
+      }
+    }
+  }
+  return tempoEvents;
 }

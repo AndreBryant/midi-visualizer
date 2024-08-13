@@ -2,6 +2,11 @@ import { loadColors } from "./src/scripts/scheme.js";
 import { Piano } from "./src/classes/piano.js";
 import { NoteCanvas } from "./src/classes/note.js";
 import { MidiParser } from "./node_modules/midi-parser-js/src/midi-parser.js";
+import {
+  interpretMidiEvents,
+  getTempoEvents,
+  checkCurrentTempo,
+} from "./src/midi-parsing/utils.js";
 
 // Canvas Dimensions
 let w;
@@ -19,6 +24,7 @@ let lastTick = 0;
 // Piano meta
 const numOfKeys = 128;
 const startKey = 0;
+const rimColor = [85, 0, 85];
 let piano;
 let pianoHeight;
 let tempoEvents;
@@ -47,10 +53,12 @@ let hasMIDIFileLoaded = false;
 // Player
 let render;
 let paused = false;
+
 let togglePlay = document.querySelector("#togglePlay");
 togglePlay.addEventListener("click", () => {
   paused = !paused;
 });
+
 let canvasToggler = document.querySelector("#canvasToggler");
 canvasToggler.addEventListener("click", toggleCanvas);
 let seekBar = document.querySelector("#seekBar");
@@ -97,7 +105,7 @@ function setup() {
   fileReader.elt.removeEventListener("change", handleFile);
   fileReader.elt.addEventListener("change", handleFile);
 
-  piano = new Piano(startKey, startKey + numOfKeys - 1, [85, 0, 85], scheme);
+  piano = new Piano(startKey, numOfKeys, rimColor, scheme);
 
   pianoHeight = piano.getKeyboardHeight();
   noteWidth = piano.getKeyWidth(0);
@@ -192,34 +200,6 @@ function windowResized() {
 function updateHW() {
   w = 1280;
   h = 720;
-}
-
-function checkCurrentTempo(tempoEvents, tick) {
-  let us = 0;
-  let i = 0;
-
-  while (i < tempoEvents.length && tick > tempoEvents[i].startTime) {
-    us = tempoEvents[i].value;
-    i++;
-  }
-  return us;
-}
-
-function getTempoEvents(tracks) {
-  let tempoEvents = [];
-  let tWallTime = 0;
-  for (const track of tracks.track) {
-    for (const event of track.event) {
-      tWallTime += event.deltaTime;
-      if (event.metaType && event.metaType === 81) {
-        tempoEvents.push({
-          value: event.data,
-          startTime: tWallTime,
-        });
-      }
-    }
-  }
-  return tempoEvents;
 }
 
 function handleFile(e) {
