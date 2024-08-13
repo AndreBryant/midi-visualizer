@@ -217,6 +217,7 @@ function record() {
   };
 }
 
+// TODO: becomes undefined on build
 function handleFile(e) {
   const file = this.files[0];
   toBase64(file).then(async (data) => {
