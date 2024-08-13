@@ -1,7 +1,7 @@
 import "../node_modules/p5/lib/p5.js";
-import "../node_modules/ccapture.js/src/CCapture.js";
+import "../node_modules/ccapture.js-npmfixed/src/CCapture.js";
 import "../node_modules/ccapture.js/src/download.js";
-import "../node_modules/ccapture.js/src/webm-writer-0.2.0.js";
+import "../node_modules/ccapture.js-npmfixed/src/webm-writer-0.2.0.js";
 
 import { MidiParser } from "../node_modules/midi-parser-js/src/midi-parser.js";
 import { toggleCanvas } from "../src/scripts/filePlayer.js";
@@ -219,8 +219,8 @@ function record() {
 
 function handleFile(e) {
   const file = this.files[0];
-  toBase64(file).then((data) => {
-    midiArray = MidiParser.parse(data);
+  toBase64(file).then(async (data) => {
+    midiArray = await MidiParser.parse(data);
     hasMIDIFileLoaded = true;
     lastTick = 0;
     paused = true;
@@ -230,7 +230,6 @@ function handleFile(e) {
     noteTracks = interpretMidiEvents(midiArray);
     numOfTracks = noteTracks.length;
     tempoEvents = getTempoEvents(midiArray);
-    console.log(tempoEvents);
     ppq = midiArray.timeDivision;
     scheme = loadColors(numOfTracks);
     setup();
