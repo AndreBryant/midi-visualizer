@@ -71,11 +71,8 @@ let hasMIDIFileLoaded = false;
 
 // Player
 let paused = false;
-
 let togglePlay;
-
 let canvasToggler;
-
 let seeker;
 
 function pause() {
@@ -183,8 +180,8 @@ function draw() {
     paused = true;
     if (capturer) {
       capturer.stop();
-      // capturer.save(saveAsMp4);
       capturer.save();
+      // capturer.save(saveAsMp4);
       capturer = null;
       recorder.textContent = "Start Recording";
       recorder.onclick = record;
@@ -219,8 +216,8 @@ function record() {
   recorder.textContent = "cancel recording";
   recorder.onclick = (e) => {
     capturer.stop();
-    // capturer.save(saveAsMp4);
     capturer.save();
+    // capturer.save(saveAsMp4);
     capturer = null;
     recorder.textContent = "Start recording";
     recorder.onclick = record;
