@@ -1,9 +1,15 @@
 import "../node_modules/p5/lib/p5.js";
+
+// Bundlimg:
 import "../node_modules/ccapture.js-npmfixed/src/CCapture.js";
-import "../node_modules/ccapture.js/src/download.js";
+import "../node_modules/ccapture.js-npmfixed/src/download.js";
 import "../node_modules/ccapture.js-npmfixed/src/webm-writer-0.2.0.js";
 
-import { MidiParser } from "../node_modules/midi-parser-js/src/midi-parser.js";
+// Development
+// import "../node_modules/ccapture.js/src/CCapture.js";
+// import "../node_modules/ccapture.js/src/download.js";
+// import "../node_modules/ccapture.js/src/webm-writer-0.2.0.js";
+
 import { toggleCanvas } from "../src/scripts/filePlayer.js";
 import { loadColors } from "../src/scripts/scheme.js";
 import { NoteCanvas } from "../src/classes/note.js";
@@ -14,6 +20,11 @@ import {
   checkCurrentTempo,
 } from "./midi-parsing/utils.js";
 import { saveAsMp4 } from "./scripts/webmHandler.js";
+
+let MidiParser;
+import("./library/main.js").then((m) => {
+  MidiParser = m.MidiParser;
+});
 
 // Canvas Dimensions
 let w;
@@ -66,9 +77,6 @@ let togglePlay;
 let canvasToggler;
 
 let seeker;
-
-// camera
-let cam;
 
 function pause() {
   paused = !paused;
@@ -217,11 +225,10 @@ function record() {
   };
 }
 
-// TODO: becomes undefined on build
 function handleFile(e) {
   const file = this.files[0];
-  toBase64(file).then(async (data) => {
-    midiArray = await MidiParser.parse(data);
+  toBase64(file).then((data) => {
+    midiArray = MidiParser.parse(data);
     hasMIDIFileLoaded = true;
     lastTick = 0;
     paused = true;
