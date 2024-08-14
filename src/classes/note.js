@@ -96,7 +96,7 @@ export class NoteCanvas {
     }
   }
 
-  updateCanvas(currentTick, probeTick, tickSkip) {
+  updateCanvas(currentTick, probeTick, tickSkip, ppq) {
     this.setNoteSpeed(tickSkip);
     for (let [i, noteTrack] of this.noteTracks.entries()) {
       noteTrack = noteTrack.filter(
@@ -120,6 +120,7 @@ export class NoteCanvas {
             w -= this.noteWidth / 2;
           }
 
+          // TODO: fix calculation of dy
           const y =
             -note.duration -
             this.boundary -

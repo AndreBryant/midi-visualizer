@@ -1,8 +1,9 @@
 export function toggleCanvas(canvas) {
-  if (!isElementHidden(canvas)) {
-    canvas.hide();
+  const style = window.getComputedStyle(canvas.elt);
+  if (style.display === "none") {
+    canvas.elt.style.display = "block";
   } else {
-    canvas.show();
+    canvas.elt.style.display = "none";
   }
 }
 

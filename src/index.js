@@ -1,14 +1,14 @@
 import "../node_modules/p5/lib/p5.js";
 
 // Bundlimg:
-import "../node_modules/ccapture.js-npmfixed/src/CCapture.js";
-import "../node_modules/ccapture.js-npmfixed/src/download.js";
-import "../node_modules/ccapture.js-npmfixed/src/webm-writer-0.2.0.js";
+// import "../node_modules/ccapture.js-npmfixed/src/CCapture.js";
+// import "../node_modules/ccapture.js-npmfixed/src/download.js";
+// import "../node_modules/ccapture.js-npmfixed/src/webm-writer-0.2.0.js";
 
 // Development
-// import "../node_modules/ccapture.js/src/CCapture.js";
-// import "../node_modules/ccapture.js/src/download.js";
-// import "../node_modules/ccapture.js/src/webm-writer-0.2.0.js";
+import "../node_modules/ccapture.js/src/CCapture.js";
+import "../node_modules/ccapture.js/src/download.js";
+import "../node_modules/ccapture.js/src/webm-writer-0.2.0.js";
 
 import { toggleCanvas } from "../src/scripts/filePlayer.js";
 import { loadColors } from "../src/scripts/scheme.js";
@@ -20,6 +20,7 @@ import {
   checkCurrentTempo,
 } from "./midi-parsing/utils.js";
 import { saveAsMp4 } from "./scripts/webmHandler.js";
+import { toBase64 } from "./scripts/fileHandling.js";
 
 let MidiParser;
 import("./library/main.js").then((m) => {
@@ -27,78 +28,79 @@ import("./library/main.js").then((m) => {
 });
 
 // Canvas Dimensions
-let w;
-let h;
+let w, h;
 
 // scheme
-let scheme = [];
+let scheme;
 
 // MIDI Data
-let noteTracks;
-let midiArray = [];
-let numOfTracks;
+let noteTracks, midiArray, numOfTracks;
 let lastTick = 0;
 
 // Piano meta
+let piano, pianoHeight, tempoEvents, ppq;
+const rimColor = [85, 0, 85];
 const numOfKeys = 128;
 const startKey = 0;
-const rimColor = [85, 0, 85];
-let piano;
-let pianoHeight;
-let tempoEvents;
-let ppq;
 
 // Note Canvas
-let noteCanvas;
-let noteWidth;
+let noteCanvas, noteWidth;
 
 // Animation frames
+let tickSkip, probeDiff, probeTick, tickCount;
 let delayStart = 0;
-let tickSkip;
-let probeDiff;
-let probeTick = 0 - delayStart;
-let tickCount = 0;
 
 // Video rendering
+let capturer, recorder, p5Canvas;
 let fps = 60;
-let capturer;
-let recorder;
-let p5Canvas;
 
 // File input
-let fileReader;
 let hasMIDIFileLoaded = false;
+let fileReader;
 
 // Player
 let paused = false;
-let togglePlay;
-let canvasToggler;
-let seeker;
+let togglePlay, canvasToggler, seeker;
 
 function pause() {
   paused = !paused;
 }
 
-function setup() {
-  updateHW();
-  frameRate(fps);
-  p5Canvas = createCanvas(w, h);
-  p5Canvas.parent("sketch-holder");
+function seek() {
+  const val = seeker.value();
+  probeTick = val;
+  tickCount = probeTick + probeDiff;
 
-  fileReader = select("#filereader");
-  fileReader.elt.removeEventListener("change", handleFile);
-  fileReader.elt.addEventListener("change", handleFile);
+  // TODO: update notecanvas while seeking
+  noteCanvas.updateCanvas(tickCount, probeTick, tickSkip, ppq);
+  noteCanvas.show();
+  // noteCanvas.checkNotes();
 
-  togglePlay = select("#togglePlay");
-  togglePlay.elt.removeEventListener("click", pause);
-  togglePlay.elt.addEventListener("click", pause);
+  piano.updateKeyboardState(tickCount);
+  piano.show();
+  piano.drawKeyboardState();
+}
 
-  canvasToggler = select("#canvasToggler");
-  canvasToggler.elt.removeEventListener("click", () => toggleCanvas(p5Canvas));
-  canvasToggler.elt.addEventListener("click", () => toggleCanvas(p5Canvas));
+function handleFile(e) {
+  const file = this.files[0];
+  toBase64(file).then((data) => {
+    midiArray = MidiParser.parse(data);
+    hasMIDIFileLoaded = true;
+    lastTick = 0;
+    paused = true;
+    // p5Canvas = null;
+    piano = null;
+    noteCanvas = null;
+    noteTracks = interpretMidiEvents(midiArray);
+    numOfTracks = noteTracks.length;
+    tempoEvents = getTempoEvents(midiArray);
+    ppq = midiArray.timeDivision;
+    scheme = loadColors(numOfTracks);
+    onMidiLoaded();
+  });
+}
 
-  seeker = select("#seeker");
-
+function onMidiLoaded() {
   piano = new Piano(startKey, numOfKeys, rimColor, scheme);
 
   pianoHeight = piano.getKeyboardHeight();
@@ -133,19 +135,36 @@ function setup() {
 
     seeker.attribute("max", lastTick);
     seeker.attribute("min", 0);
-    seeker.changed(() => {
-      const val = seeker.value();
-      probeTick = val;
-      tickCount = probeTick + probeDiff;
-    });
+    seeker.changed(seek);
 
     piano.setNoteTracks(noteTracks);
     noteCanvas.setNoteTracks(noteTracks);
   }
+}
+
+function setup() {
+  updateHW();
+  frameRate(fps);
+  p5Canvas = createCanvas(w, h);
+  p5Canvas.parent("sketch-holder");
+
+  fileReader = select("#filereader");
+  fileReader.elt.addEventListener("change", handleFile);
+
+  togglePlay = select("#togglePlay");
+  togglePlay.elt.addEventListener("click", pause);
+
+  canvasToggler = select("#canvasToggler");
+  canvasToggler.elt.addEventListener("click", () => toggleCanvas(p5Canvas));
+
+  seeker = select("#seeker");
+
   if (!recorder) {
     recorder = document.querySelector("#renderStarter");
     recorder.onclick = record;
   }
+
+  onMidiLoaded();
 }
 
 function draw() {
@@ -167,7 +186,7 @@ function draw() {
 
     background(24);
 
-    noteCanvas.updateCanvas(tickCount, probeTick, tickSkip);
+    noteCanvas.updateCanvas(tickCount, probeTick, tickSkip, ppq);
     noteCanvas.show();
     noteCanvas.checkNotes();
 
@@ -208,7 +227,7 @@ function updateHW() {
 
 // animation
 function record() {
-  capturer = new CCapture({ format: "webm", framerate: 60 });
+  capturer = new CCapture({ format: "webm", framerate: 60, verbose: true });
   capturer.start();
 
   paused = false;
@@ -222,41 +241,6 @@ function record() {
     recorder.textContent = "Start recording";
     recorder.onclick = record;
   };
-}
-
-function handleFile(e) {
-  const file = this.files[0];
-  toBase64(file).then((data) => {
-    midiArray = MidiParser.parse(data);
-    hasMIDIFileLoaded = true;
-    lastTick = 0;
-    paused = true;
-    p5Canvas = null;
-    piano = null;
-    noteCanvas = null;
-    noteTracks = interpretMidiEvents(midiArray);
-    numOfTracks = noteTracks.length;
-    tempoEvents = getTempoEvents(midiArray);
-    ppq = midiArray.timeDivision;
-    scheme = loadColors(numOfTracks);
-    setup();
-  });
-}
-
-async function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    var reader = new FileReader();
-
-    reader.readAsDataURL(file);
-
-    reader.onload = function () {
-      resolve(reader.result);
-    };
-
-    reader.onerror = function (error) {
-      reject(error);
-    };
-  });
 }
 
 window.setup = setup;
