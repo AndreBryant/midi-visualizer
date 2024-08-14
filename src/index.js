@@ -183,7 +183,8 @@ function draw() {
     paused = true;
     if (capturer) {
       capturer.stop();
-      capturer.save(saveAsMp4);
+      // capturer.save(saveAsMp4);
+      capturer.save();
       capturer = null;
       recorder.textContent = "Start Recording";
       recorder.onclick = record;
@@ -218,7 +219,8 @@ function record() {
   recorder.textContent = "cancel recording";
   recorder.onclick = (e) => {
     capturer.stop();
-    capturer.save(saveAsMp4);
+    // capturer.save(saveAsMp4);
+    capturer.save();
     capturer = null;
     recorder.textContent = "Start recording";
     recorder.onclick = record;
