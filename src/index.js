@@ -114,7 +114,8 @@ function onMidiLoaded() {
     scheme
   );
 
-  probeDiff = -(height + pianoHeight) - 2;
+  probeDiff = -(height + pianoHeight); // if 1 px == 1 tick... IDK, need to fix this in the future.
+  console.log(probeDiff, probeDiff + ppq);
   tickCount = probeDiff - delayStart;
   probeTick = 0 - delayStart;
 
@@ -181,7 +182,7 @@ function draw() {
 
     probeTick += tickSkip;
     tickCount += tickSkip;
-
+    console.log(tickSkip);
     seeker.value(tickCount);
 
     background(24);

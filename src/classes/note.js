@@ -120,7 +120,6 @@ export class NoteCanvas {
             w -= this.noteWidth / 2;
           }
 
-          // TODO: fix calculation of dy
           const y =
             -note.duration -
             this.boundary -
