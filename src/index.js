@@ -224,6 +224,8 @@ function windowResized() {
 function updateHW() {
   w = 1280;
   h = 720;
+  // w = 1920;
+  // h = 1080;
 }
 
 // animation

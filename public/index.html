@@ -4,35 +4,49 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <style>
-      body {
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-
-        align-items: center;
-      }
-
-      #sketch-holder {
-        overflow-x: auto;
-        border: 1px solid black;
-      }
-    </style>
+    <style></style>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- <script src="../dist/main.js"></script> -->
     <script src="../src/index.js" type="module"></script>
   </head>
 
-  <body>
-    <div id="sketch-holder"></div>
-    <label for="seeker">Time Stamp in ticks here</label>
-    <input type="range" name="seeker" id="seeker" min="0" max="0" values="0" />
-    <button type="button" id="togglePlay">Play/Pause</button>
-    <button type="button" id="canvasToggler">Show/hide Canvas</button>
-    <button type="button" id="renderStarter">Start Recording</button>
-    <div class="menu">
-      <label for="filereader">File:</label>
-      <input type="file" id="filereader" name="filereader" accept=".mid" />
+  <body class="w-screen h-screen sm:overflow-hidden my-4 mx-2">
+    <div class="w-full h-full p-0 flex flex-col sm:flex-row border">
+      <div class="w-96 flex flex-col gap-4">
+        <header class="h-16">
+          <h1 class="text-xl font">App</h1>
+        </header>
+        <aside class="">
+          <button type="button" id="canvasToggler">Show/hide Canvas</button>
+          <button type="button" id="renderStarter">Start Recording</button>
+          <div class="menu">
+            <label for="filereader">File:</label>
+            <input
+              type="file"
+              id="filereader"
+              name="filereader"
+              accept=".mid"
+            />
+          </div>
+        </aside>
+      </div>
+      <div class="flex flex-row flex-grow border">
+        <main class="flex-grow border">
+          <div id="sketch-holder" class="flex-grow border"></div>
+          <div class="h-24">
+            <label for="seeker">Time Stamp in ticks here</label>
+            <input
+              type="range"
+              name="seeker"
+              id="seeker"
+              min="0"
+              max="0"
+              values="0"
+            />
+            <button type="button" id="togglePlay">Play/Pause</button>
+          </div>
+        </main>
+      </div>
     </div>
   </body>
 </html>
